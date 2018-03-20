@@ -39,6 +39,9 @@ class AAvatarWoCtCCharacter : public ACharacter
 
 	float fDefaultMoveSpeed = 600.f;
 
+	AActor* LockOnTargetRef = nullptr;
+	FVector LockTarget;
+
 public:
 	AAvatarWoCtCCharacter();
 	virtual void BeginPlay() override;
@@ -64,6 +67,8 @@ private:
 	void CheckHover();
 
 	void CenterCamera();
+
+	FVector GetLockOnTarget();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bending")
@@ -109,5 +114,15 @@ protected:
 
 	void StartGuardMode();
 	void EndGuardMode();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LockOnMode")
+	bool bLockOnModeActive = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "LockOnMode")
+	bool bIsLockOnToggle = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "LockOnMode")
+	float fLockOnDistance = 10000.f;
+
+	void StartLockOnMode();
+	void EndLockOnMode();
 };
 

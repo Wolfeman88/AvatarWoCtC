@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -69,6 +70,15 @@ void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (bCanHover) CheckHover();
+
+	if (bLockOnModeActive)
+	{
+		LockTarget = (LockOnTargetRef) ? LockOnTargetRef->GetActorLocation() : LockTarget;
+		FRotator NewLook = UKismetMathLibrary::FindLookAtRotation(FollowCamera->GetComponentLocation(), LockTarget);
+
+		APlayerController* PC = Cast<APlayerController>(Controller);
+		if (PC) PC->SetControlRotation(NewLook);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -99,6 +109,9 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	PlayerInputComponent->BindAction("GuardMode", IE_Pressed, this, &AAvatarWoCtCCharacter::StartGuardMode);
 	PlayerInputComponent->BindAction("GuardMode", IE_Released, this, &AAvatarWoCtCCharacter::EndGuardMode);
+	
+	PlayerInputComponent->BindAction("LockOnMode", IE_Pressed, this, &AAvatarWoCtCCharacter::StartLockOnMode);
+	PlayerInputComponent->BindAction("LockOnMode", IE_Released, this, &AAvatarWoCtCCharacter::EndLockOnMode);
 }
 
 void AAvatarWoCtCCharacter::CheckHover()
@@ -123,6 +136,24 @@ void AAvatarWoCtCCharacter::CenterCamera()
 		APlayerController* PC = Cast<APlayerController>(Controller);
 		if (PC) PC->SetControlRotation(GetActorRotation());
 	}
+}
+
+FVector AAvatarWoCtCCharacter::GetLockOnTarget()
+{
+	FHitResult Hit;
+	FVector TraceStart = FollowCamera->GetComponentTransform().GetLocation();
+	FRotator TraceDirection = GetControlRotation();
+	FVector TraceDestination = TraceStart + TraceDirection.Vector() * fLockOnDistance;
+	FCollisionQueryParams params = FCollisionQueryParams(TEXT("LockOnTarget"), false, this);
+
+	if (GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceDestination, FCollisionObjectQueryParams::AllObjects, params))
+	{
+		LockOnTargetRef = Cast<AActor>(Hit.GetActor());		
+		TraceDestination = (LockOnTargetRef) ? LockOnTargetRef->GetActorLocation() : Hit.Location;
+	}
+	else LockOnTargetRef = nullptr;
+
+	return TraceDestination;
 }
 
 void AAvatarWoCtCCharacter::StartJump()
@@ -167,6 +198,18 @@ void AAvatarWoCtCCharacter::StartGuardMode()
 void AAvatarWoCtCCharacter::EndGuardMode()
 {
 	if (!bIsGuardToggle && bGuardModeActive) StartGuardMode();
+}
+
+void AAvatarWoCtCCharacter::StartLockOnMode()
+{
+	bLockOnModeActive = !bLockOnModeActive;
+	
+	LockTarget = GetLockOnTarget();
+}
+
+void AAvatarWoCtCCharacter::EndLockOnMode()
+{
+	if (!bIsLockOnToggle && bLockOnModeActive) StartLockOnMode();
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)
