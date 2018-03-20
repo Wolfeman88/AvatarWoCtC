@@ -11,7 +11,6 @@
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
-
 AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 {
 	// Set size for collision capsule
@@ -65,11 +64,7 @@ void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (bCanHover && bJumpHeld && GetVelocity().Z < 0.f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
-	{
-		GetCharacterMovement()->GravityScale = fHoverGravityScale;
-		GetCharacterMovement()->AirControl = fHoverAirControl;
-	}
+	if (bCanHover) CheckHover();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,6 +87,15 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("TurnRate", this, &AAvatarWoCtCCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AAvatarWoCtCCharacter::LookUpAtRate);
+}
+
+void AAvatarWoCtCCharacter::CheckHover()
+{
+	if (bJumpHeld && GetVelocity().Z < 0.f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
+	{
+		GetCharacterMovement()->GravityScale = fHoverGravityScale;
+		GetCharacterMovement()->AirControl = fHoverAirControl;
+	}
 }
 
 void AAvatarWoCtCCharacter::StartJump()

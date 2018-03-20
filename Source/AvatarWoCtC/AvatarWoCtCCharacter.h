@@ -35,6 +35,8 @@ class AAvatarWoCtCCharacter : public ACharacter
 	float fDefaultGravityScale = 1.f;
 	float fDefaultAirControl = 0.2f;
 
+	void CheckHover();
+
 
 public:
 	AAvatarWoCtCCharacter();
