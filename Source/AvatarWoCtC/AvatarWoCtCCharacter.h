@@ -37,6 +37,8 @@ class AAvatarWoCtCCharacter : public ACharacter
 
 	float fDefaultBoomLength = 400.f;
 
+	float fDefaultMoveSpeed = 600.f;
+
 public:
 	AAvatarWoCtCCharacter();
 	virtual void BeginPlay() override;
@@ -56,9 +58,6 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Ranged Mode")
-	bool bIsRangedToggle = false;
 
 private:
 
@@ -89,15 +88,26 @@ protected:
 	void StartJump();
 	void EndJump();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
-	float fRangedBoomLength = 200.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
-	float fCameraShiftOffset = 100.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RangedMode")
 	bool bRangedModeActive = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "RangedMode")
+	bool bIsRangedToggle = true;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RangedMode")
+	float fRangedBoomLength = 200.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "RangedMode")
+	float fCameraShiftOffset = 100.f;
 
 	void StartRangedMode();
 	void EndRangedMode();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GuardMode")
+	bool bGuardModeActive = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "GuardMode")
+	bool bIsGuardToggle = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "GuardMode")
+	float fGuardModeSpeedFactor = 0.75f;
+
+	void StartGuardMode();
+	void EndGuardMode();
 };
 

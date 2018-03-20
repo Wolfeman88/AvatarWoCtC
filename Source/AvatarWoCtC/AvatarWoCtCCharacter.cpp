@@ -60,6 +60,8 @@ void AAvatarWoCtCCharacter::BeginPlay()
 	JumpMaxCount = JumpMaxCount + bCanDoubleJump;
 
 	fDefaultBoomLength = CameraBoom->TargetArmLength;
+
+	fDefaultMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
 }
 
 void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
@@ -94,6 +96,9 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("RangedMode", IE_Released, this, &AAvatarWoCtCCharacter::EndRangedMode);
 
 	PlayerInputComponent->BindAction("CenterCamera", IE_Pressed, this, &AAvatarWoCtCCharacter::CenterCamera);
+
+	PlayerInputComponent->BindAction("GuardMode", IE_Pressed, this, &AAvatarWoCtCCharacter::StartGuardMode);
+	PlayerInputComponent->BindAction("GuardMode", IE_Released, this, &AAvatarWoCtCCharacter::EndGuardMode);
 }
 
 void AAvatarWoCtCCharacter::CheckHover()
@@ -150,6 +155,18 @@ void AAvatarWoCtCCharacter::StartRangedMode()
 void AAvatarWoCtCCharacter::EndRangedMode()
 {
 	if (!bIsRangedToggle && bRangedModeActive) StartRangedMode();
+}
+
+void AAvatarWoCtCCharacter::StartGuardMode()
+{
+	bGuardModeActive = !bGuardModeActive;
+
+	GetCharacterMovement()->MaxWalkSpeed = fDefaultMoveSpeed * ((bGuardModeActive) ? fGuardModeSpeedFactor : 1.f);
+}
+
+void AAvatarWoCtCCharacter::EndGuardMode()
+{
+	if (!bIsGuardToggle && bGuardModeActive) StartGuardMode();
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)
