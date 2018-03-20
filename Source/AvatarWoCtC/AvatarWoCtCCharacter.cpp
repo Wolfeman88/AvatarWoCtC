@@ -35,7 +35,7 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = fDefaultBoomLength; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -58,6 +58,8 @@ void AAvatarWoCtCCharacter::BeginPlay()
 	bCanHover = (BendingDiscipline == EBendingDisciplineType::BDT_Air) || (BendingDiscipline == EBendingDisciplineType::BDT_Fire);
 
 	JumpMaxCount = JumpMaxCount + bCanDoubleJump;
+
+	fDefaultBoomLength = CameraBoom->TargetArmLength;
 }
 
 void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
@@ -83,10 +85,15 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
 	// "turn" handles devices that provide an absolute delta, such as a mouse.
 	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Turn", this, &AAvatarWoCtCCharacter::RotateYaw);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AAvatarWoCtCCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &AAvatarWoCtCCharacter::RotatePitch);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AAvatarWoCtCCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("RangedMode", IE_Pressed, this, &AAvatarWoCtCCharacter::StartRangedMode);
+	PlayerInputComponent->BindAction("RangedMode", IE_Released, this, &AAvatarWoCtCCharacter::EndRangedMode);
+
+	PlayerInputComponent->BindAction("CenterCamera", IE_Pressed, this, &AAvatarWoCtCCharacter::CenterCamera);
 }
 
 void AAvatarWoCtCCharacter::CheckHover()
@@ -95,6 +102,21 @@ void AAvatarWoCtCCharacter::CheckHover()
 	{
 		GetCharacterMovement()->GravityScale = fHoverGravityScale;
 		GetCharacterMovement()->AirControl = fHoverAirControl;
+	}
+}
+
+void AAvatarWoCtCCharacter::CenterCamera()
+{
+	if (bRangedModeActive)
+	{
+		float currentOffsetFactor = FollowCamera->GetRelativeTransform().GetLocation().Y;
+		currentOffsetFactor = -1.f * (currentOffsetFactor / FMath::Abs(currentOffsetFactor));
+		FollowCamera->SetRelativeLocation(FVector(0.f, fCameraShiftOffset * currentOffsetFactor, 0.f));
+	}
+	else
+	{
+		APlayerController* PC = Cast<APlayerController>(Controller);
+		if (PC) PC->SetControlRotation(GetActorRotation());
 	}
 }
 
@@ -113,16 +135,43 @@ void AAvatarWoCtCCharacter::EndJump()
 	GetCharacterMovement()->AirControl = fDefaultAirControl;
 }
 
+void AAvatarWoCtCCharacter::StartRangedMode()
+{
+	bRangedModeActive = !bRangedModeActive;
+
+	if (bRangedModeActive) CenterCamera(); 
+
+	CameraBoom->TargetArmLength = (bRangedModeActive) ? fRangedBoomLength : fDefaultBoomLength;
+	FollowCamera->SetRelativeLocation(FVector(0.f, (bRangedModeActive) ? fCameraShiftOffset : 0.f, 0.f));
+
+	bUseControllerRotationYaw = bRangedModeActive;
+}
+
+void AAvatarWoCtCCharacter::EndRangedMode()
+{
+	if (!bIsRangedToggle && bRangedModeActive) StartRangedMode();
+}
+
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AAvatarWoCtCCharacter::RotateYaw(float Rate)
+{
+	AddControllerYawInput(Rate);
+}
+
 void AAvatarWoCtCCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AAvatarWoCtCCharacter::RotatePitch(float Rate)
+{
+	AddControllerPitchInput(Rate);
 }
 
 void AAvatarWoCtCCharacter::MoveForward(float Value)

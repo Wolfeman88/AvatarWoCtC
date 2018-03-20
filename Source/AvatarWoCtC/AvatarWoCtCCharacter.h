@@ -35,13 +35,15 @@ class AAvatarWoCtCCharacter : public ACharacter
 	float fDefaultGravityScale = 1.f;
 	float fDefaultAirControl = 0.2f;
 
-	void CheckHover();
-
+	float fDefaultBoomLength = 400.f;
 
 public:
 	AAvatarWoCtCCharacter();
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+
+	// APawn interface
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -55,6 +57,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Ranged Mode")
+	bool bIsRangedToggle = false;
+
+private:
+
+	void CheckHover();
+
+	void CenterCamera();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bending")
@@ -66,11 +76,10 @@ protected:
 	void MoveRight(float Value);
 	/** @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate */
 	void TurnAtRate(float Rate);
+	void RotateYaw(float Rate);
 	/** @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate */
 	void LookUpAtRate(float Rate);
-
-	// APawn interface
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	void RotatePitch(float Rate);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jumping")
 	float fHoverGravityScale = 0.25f;
@@ -79,6 +88,16 @@ protected:
 
 	void StartJump();
 	void EndJump();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	float fRangedBoomLength = 200.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	float fCameraShiftOffset = 100.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	bool bRangedModeActive = false;
+
+	void StartRangedMode();
+	void EndRangedMode();
 
 };
 
