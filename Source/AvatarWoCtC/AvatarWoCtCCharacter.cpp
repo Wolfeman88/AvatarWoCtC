@@ -31,6 +31,7 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->MovementState.bCanCrouch = true;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -47,6 +48,30 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
 
+void AAvatarWoCtCCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	fDefaultAirControl = GetCharacterMovement()->AirControl;
+	fDefaultGravityScale = GetCharacterMovement()->GravityScale;
+
+	bCanDoubleJump = (BendingDiscipline == EBendingDisciplineType::BDT_Air) || (BendingDiscipline == EBendingDisciplineType::BDT_None);
+	bCanHover = (BendingDiscipline == EBendingDisciplineType::BDT_Air) || (BendingDiscipline == EBendingDisciplineType::BDT_Fire);
+
+	JumpMaxCount = JumpMaxCount + bCanDoubleJump;
+}
+
+void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (bCanHover && bJumpHeld && GetVelocity().Z < 0.f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
+	{
+		GetCharacterMovement()->GravityScale = fHoverGravityScale;
+		GetCharacterMovement()->AirControl = fHoverAirControl;
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -54,8 +79,8 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 {
 	// Set up gameplay key bindings
 	check(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AAvatarWoCtCCharacter::StartJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AAvatarWoCtCCharacter::EndJump);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &AAvatarWoCtCCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AAvatarWoCtCCharacter::MoveRight);
@@ -67,6 +92,21 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("TurnRate", this, &AAvatarWoCtCCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AAvatarWoCtCCharacter::LookUpAtRate);
+}
+
+void AAvatarWoCtCCharacter::StartJump()
+{
+	bJumpHeld = true;
+	Jump();
+}
+
+void AAvatarWoCtCCharacter::EndJump()
+{
+	bJumpHeld = false;
+	StopJumping();
+
+	GetCharacterMovement()->GravityScale = fDefaultGravityScale;
+	GetCharacterMovement()->AirControl = fDefaultAirControl;
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)
