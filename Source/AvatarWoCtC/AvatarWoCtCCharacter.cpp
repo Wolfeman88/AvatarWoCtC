@@ -54,7 +54,7 @@ void AAvatarWoCtCCharacter::BeginPlay()
 	fDefaultAirControl = GetCharacterMovement()->AirControl;
 	fDefaultGravityScale = GetCharacterMovement()->GravityScale;
 
-	bCanDoubleJump = (BendingDiscipline == EBendingDisciplineType::BDT_Air) || (BendingDiscipline == EBendingDisciplineType::BDT_None);
+	bCanDoubleJump = BendingDiscipline == EBendingDisciplineType::BDT_Air;
 	bCanHover = (BendingDiscipline == EBendingDisciplineType::BDT_Air) || (BendingDiscipline == EBendingDisciplineType::BDT_Fire);
 
 	JumpMaxCount = JumpMaxCount + bCanDoubleJump;
