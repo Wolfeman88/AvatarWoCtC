@@ -63,21 +63,35 @@ void AAvatarWoCtCCharacter::BeginPlay()
 	fDefaultBoomLength = CameraBoom->TargetArmLength;
 
 	fDefaultMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
+	fDefaultJumpZVelocity = GetCharacterMovement()->JumpZVelocity;
 }
 
 void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (bCanHover) CheckHover();
+	if (bLockOnModeActive) FocusLockTarget();
 
-	if (bLockOnModeActive)
+	if (bJumpingForward)
 	{
-		LockTarget = (LockOnTargetRef) ? LockOnTargetRef->GetActorLocation() : LockTarget;
-		FRotator NewLook = UKismetMathLibrary::FindLookAtRotation(FollowCamera->GetComponentLocation(), LockTarget);
+		float VelocityMax = GetCharacterMovement()->MaxWalkSpeed * ((bRangedModeActive) ? RangedForwardVelocityFactor : LockOnLateralVelocityFactor);
+		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.Z * GetActorUpVector() + JumpDirection * VelocityMax;
+	}
+	else if (bCanHover) CheckHover();
+}
 
-		APlayerController* PC = Cast<APlayerController>(Controller);
-		if (PC) PC->SetControlRotation(NewLook);
+void AAvatarWoCtCCharacter::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
+
+	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
+	{
+		GetCharacterMovement()->JumpZVelocity = fDefaultJumpZVelocity;
+		GetCharacterMovement()->AirControl = fDefaultAirControl;
+		GetCharacterMovement()->GravityScale = 1.f;
+		bJumpingForward = false;
+		JumpDirection = FVector::ZeroVector;
 	}
 }
 
@@ -118,9 +132,18 @@ void AAvatarWoCtCCharacter::CheckHover()
 {
 	if (bJumpHeld && GetVelocity().Z < 0.f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
 	{
-		GetCharacterMovement()->GravityScale = fHoverGravityScale;
-		GetCharacterMovement()->AirControl = fHoverAirControl;
+		GetCharacterMovement()->GravityScale = HoverGravityScale;
+		GetCharacterMovement()->AirControl = HoverAirControl;
 	}
+}
+
+void AAvatarWoCtCCharacter::FocusLockTarget()
+{
+	LockTarget = (LockOnTargetRef) ? LockOnTargetRef->GetActorLocation() : LockTarget;
+	FRotator NewLook = UKismetMathLibrary::FindLookAtRotation(FollowCamera->GetComponentLocation(), LockTarget);
+
+	APlayerController* PC = Cast<APlayerController>(Controller);
+	if (PC) PC->SetControlRotation(NewLook);
 }
 
 void AAvatarWoCtCCharacter::CenterCamera()
@@ -129,7 +152,7 @@ void AAvatarWoCtCCharacter::CenterCamera()
 	{
 		float currentOffsetFactor = FollowCamera->GetRelativeTransform().GetLocation().Y;
 		currentOffsetFactor = -1.f * (currentOffsetFactor / FMath::Abs(currentOffsetFactor));
-		FollowCamera->SetRelativeLocation(FVector(0.f, fCameraShiftOffset * currentOffsetFactor, 0.f));
+		FollowCamera->SetRelativeLocation(FVector(0.f, CameraShiftOffset * currentOffsetFactor, 0.f));
 	}
 	else
 	{
@@ -143,7 +166,7 @@ FVector AAvatarWoCtCCharacter::GetLockOnTarget()
 	FHitResult Hit;
 	FVector TraceStart = FollowCamera->GetComponentTransform().GetLocation();
 	FRotator TraceDirection = GetControlRotation();
-	FVector TraceDestination = TraceStart + TraceDirection.Vector() * fLockOnDistance;
+	FVector TraceDestination = TraceStart + TraceDirection.Vector() * LockOnDistance;
 	FCollisionQueryParams params = FCollisionQueryParams(TEXT("LockOnTarget"), false, this);
 
 	if (GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceDestination, FCollisionObjectQueryParams::AllObjects, params))
@@ -159,6 +182,34 @@ FVector AAvatarWoCtCCharacter::GetLockOnTarget()
 void AAvatarWoCtCCharacter::StartJump()
 {
 	bJumpHeld = true;
+
+	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
+	{
+		if (bLockOnModeActive) return;
+		else GetCharacterMovement()->JumpZVelocity = fDefaultJumpZVelocity;
+	}
+	else
+	{
+		bJumpingForward = (bRangedModeActive || bLockOnModeActive);
+		JumpDirection = GetActorForwardVector();
+
+		if (bRangedModeActive)
+		{
+			GetCharacterMovement()->AirControl = RangedAirControlFactor;
+			GetCharacterMovement()->JumpZVelocity = RangedJumpVelocityFactor * fDefaultJumpZVelocity;
+		}
+		else if (bLockOnModeActive)
+		{
+			GetCharacterMovement()->GravityScale = LockOnGravityScale;
+			GetCharacterMovement()->AirControl = LockOnAirControlFactor;
+		}
+		else if (bGuardModeActive)
+		{
+			GetCharacterMovement()->AirControl = GuardAirControlFactor;
+			GetCharacterMovement()->JumpZVelocity = GuardJumpVelocityFactor * fDefaultJumpZVelocity;
+		}
+	}
+
 	Jump();
 }
 
@@ -177,8 +228,8 @@ void AAvatarWoCtCCharacter::StartRangedMode()
 
 	if (bRangedModeActive) CenterCamera(); 
 
-	CameraBoom->TargetArmLength = (bRangedModeActive) ? fRangedBoomLength : fDefaultBoomLength;
-	FollowCamera->SetRelativeLocation(FVector(0.f, (bRangedModeActive) ? fCameraShiftOffset : 0.f, 0.f));
+	CameraBoom->TargetArmLength = (bRangedModeActive) ? RangedBoomLength : fDefaultBoomLength;
+	FollowCamera->SetRelativeLocation(FVector(0.f, (bRangedModeActive) ? CameraShiftOffset : 0.f, 0.f));
 
 	bUseControllerRotationYaw = bRangedModeActive;
 }
@@ -192,7 +243,7 @@ void AAvatarWoCtCCharacter::StartGuardMode()
 {
 	bGuardModeActive = !bGuardModeActive;
 
-	GetCharacterMovement()->MaxWalkSpeed = fDefaultMoveSpeed * ((bGuardModeActive) ? fGuardModeSpeedFactor : 1.f);
+	GetCharacterMovement()->MaxWalkSpeed = fDefaultMoveSpeed * ((bGuardModeActive) ? GuardModeSpeedFactor : 1.f);
 }
 
 void AAvatarWoCtCCharacter::EndGuardMode()
