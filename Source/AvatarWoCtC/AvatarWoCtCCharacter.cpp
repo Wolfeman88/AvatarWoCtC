@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "./MeleeAttackComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -46,6 +47,8 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	MeleeAttackComp = CreateDefaultSubobject<UMeleeAttackComponent>(TEXT("MeleeAttackComponent"));
 }
 
 void AAvatarWoCtCCharacter::BeginPlay()
@@ -126,6 +129,10 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	
 	PlayerInputComponent->BindAction("LockOnMode", IE_Pressed, this, &AAvatarWoCtCCharacter::StartLockOnMode);
 	PlayerInputComponent->BindAction("LockOnMode", IE_Released, this, &AAvatarWoCtCCharacter::EndLockOnMode);
+
+	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestLightAttack);
+	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestHeavyAttack);
+	PlayerInputComponent->BindAction("StunAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestStunAttack);
 }
 
 void AAvatarWoCtCCharacter::CheckHover()
@@ -261,6 +268,114 @@ void AAvatarWoCtCCharacter::StartLockOnMode()
 void AAvatarWoCtCCharacter::EndLockOnMode()
 {
 	if (!bIsLockOnToggle && bLockOnModeActive) StartLockOnMode();
+}
+
+void AAvatarWoCtCCharacter::RequestLightAttack()
+{
+	if ((bRangedModeActive) /*|| bLockOnModeActive && 'range to target is larger than melee range'*/)
+	{
+		if (bGuardModeActive)
+		{
+			// ranged defense at target or in direction of target
+		}
+		else
+		{
+			// ranged attack at target or in direction of target
+		}
+	}
+	else
+	{
+		if (bGuardModeActive)
+		{
+			// melee defense at target or in direction of target
+		}
+		else
+		{
+			// melee attack at target or in direction of target
+			// make data tables of possible trace arrays, randomly choose
+			FMeleeTrace DefaultTrace;
+			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
+			DefaultTrace.TraceEnd = FVector(219.f, 0.f, 0.f);
+
+			FMeleeAttack newAtk;
+			newAtk.Damage = 10.f;
+			newAtk.Traces.Add(DefaultTrace);
+
+			MeleeAttackComp->ActivateMeleeAbility(EAttackType::AT_Light, newAtk);
+		}
+	}
+}
+
+void AAvatarWoCtCCharacter::RequestHeavyAttack()
+{
+	if ((bRangedModeActive) /*|| bLockOnModeActive && 'range to target is larger than melee range'*/)
+	{
+		if (bGuardModeActive)
+		{
+			// ranged defense at target or in direction of target
+		}
+		else
+		{
+			// ranged attack at target or in direction of target
+		}
+	}
+	else
+	{
+		if (bGuardModeActive)
+		{
+			// melee defense at target or in direction of target
+		}
+		else
+		{
+			// melee attack at target or in direction of target
+			// make data tables of possible trace arrays, randomly choose
+			FMeleeTrace DefaultTrace;
+			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
+			DefaultTrace.TraceEnd = FVector(219.f, 0.f, 0.f);
+
+			FMeleeAttack newAtk;
+			newAtk.Damage = 20.f;
+			newAtk.Traces.Add(DefaultTrace);
+
+			MeleeAttackComp->ActivateMeleeAbility(EAttackType::AT_Heavy, newAtk);
+		}
+	}
+}
+
+void AAvatarWoCtCCharacter::RequestStunAttack()
+{
+	if ((bRangedModeActive) /*|| bLockOnModeActive && 'range to target is larger than melee range'*/)
+	{
+		if (bGuardModeActive)
+		{
+			// ranged defense at target or in direction of target
+		}
+		else
+		{
+			// ranged attack at target or in direction of target
+		}
+	}
+	else
+	{
+		if (bGuardModeActive)
+		{
+			// melee defense at target or in direction of target
+		}
+		else
+		{
+			// melee attack at target or in direction of target
+			// make data tables of possible trace arrays, randomly choose
+			FMeleeTrace DefaultTrace;
+			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
+			DefaultTrace.TraceEnd = FVector(219.f, 0.f, 0.f);
+
+			FMeleeAttack newAtk;
+			newAtk.Damage = 5.f;
+			newAtk.Traces.Add(DefaultTrace);
+
+			MeleeAttackComp->ActivateMeleeAbility(EAttackType::AT_Stun, newAtk);
+		}
+	}
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)

@@ -28,6 +28,9 @@ class AAvatarWoCtCCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Melee", meta = (AllowPrivateAccess = "true"))
+	class UMeleeAttackComponent* MeleeAttackComp;
+
 	bool bCanDoubleJump = false;
 	bool bCanHover = false;
 	bool bJumpHeld = false;
@@ -151,5 +154,9 @@ protected:
 
 	void StartLockOnMode();
 	void EndLockOnMode();
+
+	void RequestLightAttack();
+	void RequestHeavyAttack();
+	void RequestStunAttack();
 };
 
