@@ -5,6 +5,7 @@
 #include "TimerManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "AvatarWoCtCCharacter.h"
 
 // Sets default values for this component's properties
 UMeleeAttackComponent::UMeleeAttackComponent()
@@ -27,42 +28,47 @@ void UMeleeAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UMeleeAttackComponent::BeginPlay()
 {
-	// AttackTimerHandle.Invalidate();
+	OwningCharacter = Cast<AAvatarWoCtCCharacter>(GetOwner());
+	ensure(OwningCharacter);
 }
 
 void UMeleeAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack AttackData)
 {
-	if (GetOwner()->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
+	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
 		QueuedAttack = NewAttack;
 		QueuedAttackData = AttackData;
 		return;
 	}
 
-	if (GetOwner())
+	float speedMultiplier = 1.f;
+
+	switch (NewAttack)
 	{
-		switch (NewAttack)
-		{
-		case EAttackType::AT_Light:
-			GetOwner()->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Light, LightAttackActivationTime);
-			break;
-		case EAttackType::AT_Heavy:
-			GetOwner()->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Heavy, HeavyAttackActivationTime);
-			break;
-		case EAttackType::AT_Stun:
-			GetOwner()->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Stun, StunAttackActivationTime);
-			break;
-		case EAttackType::AT_None:
-		default:
-			break;
-		}
-
-		CurrentAttack = NewAttack;
-		CurrentAttackData = AttackData;
-
-		QueuedAttack = EAttackType::AT_None;
-		QueuedAttackData = FMeleeAttack();
+	case EAttackType::AT_Light:
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Light, LightAttackActivationTime);
+		speedMultiplier = LightAttackSpeedFactor;
+		break;
+	case EAttackType::AT_Heavy:
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Heavy, HeavyAttackActivationTime);
+		speedMultiplier = HeavyAttackSpeedFactor;
+		break;
+	case EAttackType::AT_Stun:
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Stun, StunAttackActivationTime);
+		speedMultiplier = StunAttackSpeedFactor;
+		break;
+	case EAttackType::AT_None:
+	default:
+		break;
 	}
+
+	CurrentAttack = NewAttack;
+	CurrentAttackData = AttackData;
+
+	QueuedAttack = EAttackType::AT_None;
+	QueuedAttackData = FMeleeAttack();
+
+	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
 FVector UMeleeAttackComponent::GetRelativeVectorOffset(FVector Offset)
@@ -81,6 +87,12 @@ void UMeleeAttackComponent::EndAttack()
 {
 	GetOwner()->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 	if (QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(QueuedAttack, QueuedAttackData);
+	else
+	{
+		CurrentAttack = EAttackType::AT_None;
+		CurrentAttackData = FMeleeAttack();
+		OwningCharacter->ChangeSpeedWhileActivatingAbility(1.f);
+	}
 }
 
 void UMeleeAttackComponent::Light()

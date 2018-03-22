@@ -76,11 +76,7 @@ void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 
 	if (bLockOnModeActive) FocusLockTarget();
 
-	if (bJumpingForward)
-	{
-		float VelocityMax = GetCharacterMovement()->MaxWalkSpeed * ((bRangedModeActive) ? RangedForwardVelocityFactor : LockOnLateralVelocityFactor);
-		GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.Z * GetActorUpVector() + JumpDirection * VelocityMax;
-	}
+	if (bJumpingForward) LaunchForward();
 	else if (bCanHover) CheckHover();
 }
 
@@ -135,6 +131,11 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("StunAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestStunAttack);
 }
 
+void AAvatarWoCtCCharacter::ChangeSpeedWhileActivatingAbility(float SpeedFactor)
+{
+	GetCharacterMovement()->MaxWalkSpeed = fDefaultMoveSpeed * SpeedFactor;
+}
+
 void AAvatarWoCtCCharacter::CheckHover()
 {
 	if (bJumpHeld && GetVelocity().Z < 0.f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
@@ -184,6 +185,12 @@ FVector AAvatarWoCtCCharacter::GetLockOnTarget()
 	else LockOnTargetRef = nullptr;
 
 	return TraceDestination;
+}
+
+void AAvatarWoCtCCharacter::LaunchForward()
+{
+	float VelocityMax = GetCharacterMovement()->MaxWalkSpeed * ((bRangedModeActive) ? RangedForwardVelocityFactor : LockOnLateralVelocityFactor);
+	GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.Z * GetActorUpVector() + JumpDirection * VelocityMax;
 }
 
 void AAvatarWoCtCCharacter::StartJump()
@@ -299,6 +306,18 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 
 			FMeleeAttack newAtk;
 			newAtk.Damage = 10.f;
+			newAtk.Traces.Add(DefaultTrace);
+			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
+			DefaultTrace.TraceEnd = FVector(146.f, 44.f, 0.f);
+			newAtk.Traces.Add(DefaultTrace);
+			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
+			DefaultTrace.TraceEnd = FVector(146.f, -44.f, 0.f);
+			newAtk.Traces.Add(DefaultTrace);
+			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
+			DefaultTrace.TraceEnd = FVector(146.f, 0.f, 44.f);
+			newAtk.Traces.Add(DefaultTrace);
+			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
+			DefaultTrace.TraceEnd = FVector(146.f, 0.f, -44.f);
 			newAtk.Traces.Add(DefaultTrace);
 
 			MeleeAttackComp->ActivateMeleeAbility(EAttackType::AT_Light, newAtk);

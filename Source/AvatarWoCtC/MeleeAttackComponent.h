@@ -58,6 +58,8 @@ class AVATARWOCTC_API UMeleeAttackComponent : public UActorComponent
 
 	FVector GetRelativeVectorOffset(FVector Offset);
 	void EndAttack();
+	
+	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
 
 public:	
 	// Sets default values for this component's properties

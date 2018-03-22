@@ -71,6 +71,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	void ChangeSpeedWhileActivatingAbility(float SpeedFactor);
+
 private:
 
 	void CheckHover();
@@ -80,6 +82,8 @@ private:
 	void CenterCamera();
 
 	FVector GetLockOnTarget();
+
+	void LaunchForward();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bending")
