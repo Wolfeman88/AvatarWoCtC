@@ -81,6 +81,8 @@ private:
 
 	void LaunchForward();
 
+	bool CheckRollConditions();
+	void ActivateRoll();
 	void RollComplete();
 	void RollCooldownComplete();
 

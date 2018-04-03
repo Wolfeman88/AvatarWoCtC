@@ -80,26 +80,7 @@ void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 	if (bJumpingForward) LaunchForward();
 	else if (bCanHover) CheckHover();
 
-
-	if (!bIsRolling && bRollActive && (MaxRollCount - RollCooldownTimerHandles.Num() != 0))
-	{
-		FVector MovementInput = FVector(GetInputAxisValue(FName("MoveForward")), GetInputAxisValue(FName("MoveRight")), 0.f).GetSafeNormal();
-
-		if (MovementInput.Size() > 0.f)
-		{
-			bIsRolling = true;
-			FRotator RollDirection = FRotator(0.f, GetControlRotation().Yaw, 0.f);
-
-			GetWorldTimerManager().SetTimer(RollTimerHandle, this, &AAvatarWoCtCCharacter::RollComplete, RollingSpeedDistance / RollingSpeedFactor);
-
-			FTimerHandle TempRollCooldown;
-			GetWorldTimerManager().SetTimer(TempRollCooldown, this, &AAvatarWoCtCCharacter::RollCooldownComplete, RollCooldown);
-			RollCooldownTimerHandles.Add(TempRollCooldown);
-			
-			GetCharacterMovement()->Velocity = RollDirection.RotateVector(MovementInput) * GetCharacterMovement()->MaxWalkSpeed * RollingSpeedFactor;
-			GetCharacterMovement()->BrakingFrictionFactor = 0.f;
-		}
-	}
+	if (CheckRollConditions()) ActivateRoll();
 }
 
 void AAvatarWoCtCCharacter::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
@@ -188,6 +169,32 @@ void AAvatarWoCtCCharacter::LaunchForward()
 	GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.Z * GetActorUpVector() + JumpDirection * VelocityMax;
 }
 
+bool AAvatarWoCtCCharacter::CheckRollConditions()
+{
+	return !bIsRolling && bRollActive && (MaxRollCount - RollCooldownTimerHandles.Num() != 0);
+}
+
+void AAvatarWoCtCCharacter::ActivateRoll()
+{
+	FVector MovementInput = FVector(GetInputAxisValue(FName("MoveForward")), GetInputAxisValue(FName("MoveRight")), 0.f).GetSafeNormal();
+
+	if (MovementInput.Size() > 0.f)
+	{
+		bIsRolling = true;
+		FRotator RollDirection = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+
+		GetWorldTimerManager().SetTimer(RollTimerHandle, this, &AAvatarWoCtCCharacter::RollComplete, RollingSpeedDistance / RollingSpeedFactor);
+
+		FTimerHandle TempRollCooldown;
+		GetWorldTimerManager().SetTimer(TempRollCooldown, this, &AAvatarWoCtCCharacter::RollCooldownComplete, RollCooldown);
+		RollCooldownTimerHandles.Add(TempRollCooldown);
+
+		GetCharacterMovement()->Velocity = RollDirection.RotateVector(MovementInput) * GetCharacterMovement()->MaxWalkSpeed * RollingSpeedFactor;
+		GetCharacterMovement()->BrakingFrictionFactor = 0.f;
+		GetCharacterMovement()->GravityScale = (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling) ? 0.f : fDefaultGravityScale;
+	}
+}
+
 void AAvatarWoCtCCharacter::RollComplete()
 {
 	bIsRolling = false;
@@ -196,6 +203,7 @@ void AAvatarWoCtCCharacter::RollComplete()
 
 	GetCharacterMovement()->Velocity = FVector::ZeroVector;
 	GetCharacterMovement()->BrakingFrictionFactor = fDefaultBrakingFrictionFactor;
+	GetCharacterMovement()->GravityScale = fDefaultGravityScale;
 }
 
 void AAvatarWoCtCCharacter::RollCooldownComplete()
@@ -392,6 +400,8 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 
 void AAvatarWoCtCCharacter::StartRoll()
 {
+	if ((GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling) && (BendingDiscipline != EBendingDisciplineType::BDT_Air)) return;
+
 	bRollActive = true;
 }
 
