@@ -6,6 +6,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "AvatarWoCtCCharacter.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values for this component's properties
 UAttackComponent::UAttackComponent()
@@ -36,8 +37,8 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
-		QueuedAttack = NewAttack;
-		QueuedAttackData = AttackData;
+		M_QueuedAttack = NewAttack;
+		M_QueuedAttackData = AttackData;
 		return;
 	}
 
@@ -46,15 +47,15 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 	switch (NewAttack)
 	{
 	case EAttackType::AT_Light:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::Light, LightAttackActivationTime);
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Light, LightAttackActivationTime);
 		speedMultiplier = LightAttackSpeedFactor;
 		break;
 	case EAttackType::AT_Heavy:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::Heavy, HeavyAttackActivationTime);
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Heavy, HeavyAttackActivationTime);
 		speedMultiplier = HeavyAttackSpeedFactor;
 		break;
 	case EAttackType::AT_Stun:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::Stun, StunAttackActivationTime);
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Stun, StunAttackActivationTime);
 		speedMultiplier = StunAttackSpeedFactor;
 		break;
 	case EAttackType::AT_None:
@@ -62,13 +63,62 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 		break;
 	}
 
-	CurrentAttack = NewAttack;
-	CurrentAttackData = AttackData;
+	M_CurrentAttack = NewAttack;
+	M_CurrentAttackData = AttackData;
 
-	QueuedAttack = EAttackType::AT_None;
-	QueuedAttackData = FMeleeAttack();
+	M_QueuedAttack = EAttackType::AT_None;
+	M_QueuedAttackData = FMeleeAttack();
 
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
+}
+
+void UAttackComponent::ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, FVector OriginationOffset)
+{
+	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
+	{
+		R_QueuedAttack = AttackToSpawn;
+		R_QueuedOffset = OriginationOffset;
+		return;
+	}
+
+	float speedMultiplier = 1.f;
+
+	if (AttackToSpawn)
+	{
+		// ranged attack enum and actor class
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::R_Attack, 0.75f);
+		speedMultiplier = 0.1f;
+	}
+
+	R_CurrentAttack = AttackToSpawn;
+	R_CurrentOffset = OriginationOffset;
+
+	R_QueuedAttack = nullptr;
+	R_QueuedOffset = FVector::ZeroVector;
+
+	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
+}
+
+void UAttackComponent::R_Attack()
+{
+	FVector SpawnLoc = GetRelativeVectorOffset(R_CurrentOffset);
+	FRotator SpawnRot = OwningCharacter->GetControlRotation();
+	FActorSpawnParameters params;
+	params.Owner = OwningCharacter;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	AActor* SpawnRef = GetWorld()->SpawnActor<AActor>(R_CurrentAttack, SpawnLoc, SpawnRot, params);
+
+	GetOwner()->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+	if (R_QueuedAttack != nullptr) ActivateRangedAbility(R_QueuedAttack, R_QueuedOffset);
+	else
+	{
+		R_CurrentAttack = nullptr;
+		R_QueuedOffset = FVector::ZeroVector;
+		OwningCharacter->ChangeSpeedWhileActivatingAbility(1.f);
+	}
+
+	SpawnRef = nullptr;
 }
 
 FVector UAttackComponent::GetRelativeVectorOffset(FVector Offset)
@@ -86,18 +136,18 @@ FVector UAttackComponent::GetRelativeVectorOffset(FVector Offset)
 void UAttackComponent::EndAttack()
 {
 	GetOwner()->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
-	if (QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(QueuedAttack, QueuedAttackData);
+	if (M_QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(M_QueuedAttack, M_QueuedAttackData);
 	else
 	{
-		CurrentAttack = EAttackType::AT_None;
-		CurrentAttackData = FMeleeAttack();
+		M_CurrentAttack = EAttackType::AT_None;
+		M_CurrentAttackData = FMeleeAttack();
 		OwningCharacter->ChangeSpeedWhileActivatingAbility(1.f);
 	}
 }
 
-void UAttackComponent::Light()
+void UAttackComponent::M_Light()
 {
-	TArray<FMeleeTrace> traces = CurrentAttackData.Traces;
+	TArray<FMeleeTrace> traces = M_CurrentAttackData.Traces;
 
 	for (int i = 0; i < traces.Num(); i++)
 	{
@@ -110,9 +160,9 @@ void UAttackComponent::Light()
 	EndAttack();
 }
 
-void UAttackComponent::Heavy()
+void UAttackComponent::M_Heavy()
 {
-	TArray<FMeleeTrace> traces = CurrentAttackData.Traces;
+	TArray<FMeleeTrace> traces = M_CurrentAttackData.Traces;
 
 	for (int i = 0; i < traces.Num(); i++)
 	{
@@ -125,9 +175,9 @@ void UAttackComponent::Heavy()
 	EndAttack();
 }
 
-void UAttackComponent::Stun()
+void UAttackComponent::M_Stun()
 {
-	TArray<FMeleeTrace> traces = CurrentAttackData.Traces;
+	TArray<FMeleeTrace> traces = M_CurrentAttackData.Traces;
 
 	for (int i = 0; i < traces.Num(); i++)
 	{

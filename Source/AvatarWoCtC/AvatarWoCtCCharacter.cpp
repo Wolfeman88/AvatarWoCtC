@@ -9,7 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "./MeleeAttackComponent.h"
+#include "./AttackComponent.h"
 #include "TimerManager.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -288,7 +288,8 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 		}
 		else
 		{
-			// ranged attack at target or in direction of target
+			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
+			AttackComp->ActivateRangedAbility(RangedLightAttack, FVector(0.f, y_offset_sign * 88.f, 44.f));
 		}
 	}
 	else
@@ -336,7 +337,8 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 		}
 		else
 		{
-			// ranged attack at target or in direction of target
+			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
+			AttackComp->ActivateRangedAbility(RangedHeavyAttack, FVector(0.f, y_offset_sign * 88.f, 44.f));
 		}
 	}
 	else
@@ -372,7 +374,8 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 		}
 		else
 		{
-			// ranged attack at target or in direction of target
+			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
+			AttackComp->ActivateRangedAbility(RangedStunAttack, FVector(0.f, y_offset_sign * 88.f, 44.f));
 		}
 	}
 	else

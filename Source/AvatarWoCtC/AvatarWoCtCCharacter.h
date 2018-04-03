@@ -165,5 +165,12 @@ protected:
 	float RollCooldown = 5.f;
 	UPROPERTY(BlueprintReadOnly, Category = "Roll")
 	TArray<FTimerHandle> RollCooldownTimerHandles;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	TSubclassOf<AActor> RangedLightAttack = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	TSubclassOf<AActor> RangedHeavyAttack = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	TSubclassOf<AActor> RangedStunAttack = nullptr;
 };
 

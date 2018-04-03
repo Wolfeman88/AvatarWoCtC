@@ -50,16 +50,20 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 
 	TArray<AActor*> ActorsHitByAttack;
 
-	EAttackType QueuedAttack = EAttackType::AT_None;
-	FMeleeAttack QueuedAttackData;
-
-	EAttackType CurrentAttack = EAttackType::AT_None;
-	FMeleeAttack CurrentAttackData;
+	EAttackType M_QueuedAttack = EAttackType::AT_None;
+	FMeleeAttack M_QueuedAttackData;
+	EAttackType M_CurrentAttack = EAttackType::AT_None;
+	FMeleeAttack M_CurrentAttackData;
 
 	FVector GetRelativeVectorOffset(FVector Offset);
 	void EndAttack();
 	
 	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
+
+	TSubclassOf<AActor> R_QueuedAttack = nullptr;
+	FVector R_QueuedOffset = FVector::ZeroVector;
+	TSubclassOf<AActor> R_CurrentAttack = nullptr;
+	FVector R_CurrentOffset = FVector::ZeroVector;
 
 public:	
 	// Sets default values for this component's properties
@@ -71,6 +75,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Melee")
 	void ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack AttackData);
+	UFUNCTION(BlueprintCallable, Category = "Ranged")
+	void ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, FVector OriginationOffset);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Timer")
 	float LightAttackActivationTime = 1.f;
@@ -103,7 +109,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Width")
 	float Outer = 88.f;
 
-	void Light();
-	void Heavy();
-	void Stun();
+	void M_Light();
+	void M_Heavy();
+	void M_Stun();
+
+	void R_Attack();
 };
