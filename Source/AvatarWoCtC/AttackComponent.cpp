@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "MeleeAttackComponent.h"
+#include "AttackComponent.h"
 #include "GameFramework/Actor.h"
 #include "TimerManager.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -8,7 +8,7 @@
 #include "AvatarWoCtCCharacter.h"
 
 // Sets default values for this component's properties
-UMeleeAttackComponent::UMeleeAttackComponent()
+UAttackComponent::UAttackComponent()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -19,20 +19,20 @@ UMeleeAttackComponent::UMeleeAttackComponent()
 
 
 // Called every frame
-void UMeleeAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UAttackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
 }
 
-void UMeleeAttackComponent::BeginPlay()
+void UAttackComponent::BeginPlay()
 {
 	OwningCharacter = Cast<AAvatarWoCtCCharacter>(GetOwner());
 	ensure(OwningCharacter);
 }
 
-void UMeleeAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack AttackData)
+void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack AttackData)
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
@@ -46,15 +46,15 @@ void UMeleeAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAt
 	switch (NewAttack)
 	{
 	case EAttackType::AT_Light:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Light, LightAttackActivationTime);
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::Light, LightAttackActivationTime);
 		speedMultiplier = LightAttackSpeedFactor;
 		break;
 	case EAttackType::AT_Heavy:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Heavy, HeavyAttackActivationTime);
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::Heavy, HeavyAttackActivationTime);
 		speedMultiplier = HeavyAttackSpeedFactor;
 		break;
 	case EAttackType::AT_Stun:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UMeleeAttackComponent::Stun, StunAttackActivationTime);
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::Stun, StunAttackActivationTime);
 		speedMultiplier = StunAttackSpeedFactor;
 		break;
 	case EAttackType::AT_None:
@@ -71,7 +71,7 @@ void UMeleeAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAt
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
-FVector UMeleeAttackComponent::GetRelativeVectorOffset(FVector Offset)
+FVector UAttackComponent::GetRelativeVectorOffset(FVector Offset)
 {
 	FVector ActorLocation = GetOwner()->GetActorLocation();
 
@@ -83,7 +83,7 @@ FVector UMeleeAttackComponent::GetRelativeVectorOffset(FVector Offset)
 	return ActorLocation + OffsetX + OffsetY + OffsetZ;
 }
 
-void UMeleeAttackComponent::EndAttack()
+void UAttackComponent::EndAttack()
 {
 	GetOwner()->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 	if (QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(QueuedAttack, QueuedAttackData);
@@ -95,7 +95,7 @@ void UMeleeAttackComponent::EndAttack()
 	}
 }
 
-void UMeleeAttackComponent::Light()
+void UAttackComponent::Light()
 {
 	TArray<FMeleeTrace> traces = CurrentAttackData.Traces;
 
@@ -110,7 +110,7 @@ void UMeleeAttackComponent::Light()
 	EndAttack();
 }
 
-void UMeleeAttackComponent::Heavy()
+void UAttackComponent::Heavy()
 {
 	TArray<FMeleeTrace> traces = CurrentAttackData.Traces;
 
@@ -125,7 +125,7 @@ void UMeleeAttackComponent::Heavy()
 	EndAttack();
 }
 
-void UMeleeAttackComponent::Stun()
+void UAttackComponent::Stun()
 {
 	TArray<FMeleeTrace> traces = CurrentAttackData.Traces;
 

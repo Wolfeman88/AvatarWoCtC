@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Engine/DataTable.h"
-#include "MeleeAttackComponent.generated.h"
+#include "AttackComponent.generated.h"
 
 UENUM(BlueprintType)
 enum class EAttackType : uint8
@@ -44,7 +44,7 @@ struct FMeleeAttack : public FTableRowBase
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class AVATARWOCTC_API UMeleeAttackComponent : public UActorComponent
+class AVATARWOCTC_API UAttackComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -63,7 +63,7 @@ class AVATARWOCTC_API UMeleeAttackComponent : public UActorComponent
 
 public:	
 	// Sets default values for this component's properties
-	UMeleeAttackComponent();
+	UAttackComponent();
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

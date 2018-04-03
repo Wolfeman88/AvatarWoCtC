@@ -49,7 +49,7 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
-	MeleeAttackComp = CreateDefaultSubobject<UMeleeAttackComponent>(TEXT("MeleeAttackComponent"));
+	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
 }
 
 void AAvatarWoCtCCharacter::BeginPlay()
@@ -321,7 +321,7 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 			DefaultTrace.TraceEnd = FVector(146.f, 0.f, -44.f);
 			newAtk.Traces.Add(DefaultTrace);
 
-			MeleeAttackComp->ActivateMeleeAbility(EAttackType::AT_Light, newAtk);
+			AttackComp->ActivateMeleeAbility(EAttackType::AT_Light, newAtk);
 		}
 	}
 }
@@ -357,7 +357,7 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 			newAtk.Damage = 20.f;
 			newAtk.Traces.Add(DefaultTrace);
 
-			MeleeAttackComp->ActivateMeleeAbility(EAttackType::AT_Heavy, newAtk);
+			AttackComp->ActivateMeleeAbility(EAttackType::AT_Heavy, newAtk);
 		}
 	}
 }
@@ -393,7 +393,7 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 			newAtk.Damage = 5.f;
 			newAtk.Traces.Add(DefaultTrace);
 
-			MeleeAttackComp->ActivateMeleeAbility(EAttackType::AT_Stun, newAtk);
+			AttackComp->ActivateMeleeAbility(EAttackType::AT_Stun, newAtk);
 		}
 	}
 }
