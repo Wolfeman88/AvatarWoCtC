@@ -73,9 +73,7 @@ void AAvatarWoCtCCharacter::BeginPlay()
 void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	if (bLockOnModeActive) FocusLockTarget();
-
+	
 	if (bJumpingForward) LaunchForward();
 	else if (bCanHover) CheckHover();
 }
@@ -122,9 +120,6 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	PlayerInputComponent->BindAction("GuardMode", IE_Pressed, this, &AAvatarWoCtCCharacter::StartGuardMode);
 	PlayerInputComponent->BindAction("GuardMode", IE_Released, this, &AAvatarWoCtCCharacter::EndGuardMode);
-	
-	PlayerInputComponent->BindAction("LockOnMode", IE_Pressed, this, &AAvatarWoCtCCharacter::StartLockOnMode);
-	PlayerInputComponent->BindAction("LockOnMode", IE_Released, this, &AAvatarWoCtCCharacter::EndLockOnMode);
 
 	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestLightAttack);
 	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestHeavyAttack);
@@ -145,15 +140,6 @@ void AAvatarWoCtCCharacter::CheckHover()
 	}
 }
 
-void AAvatarWoCtCCharacter::FocusLockTarget()
-{
-	LockTarget = (LockOnTargetRef) ? LockOnTargetRef->GetActorLocation() : LockTarget;
-	FRotator NewLook = UKismetMathLibrary::FindLookAtRotation(FollowCamera->GetComponentLocation(), LockTarget);
-
-	APlayerController* PC = Cast<APlayerController>(Controller);
-	if (PC) PC->SetControlRotation(NewLook);
-}
-
 void AAvatarWoCtCCharacter::CenterCamera()
 {
 	if (bRangedModeActive)
@@ -169,27 +155,9 @@ void AAvatarWoCtCCharacter::CenterCamera()
 	}
 }
 
-FVector AAvatarWoCtCCharacter::GetLockOnTarget()
-{
-	FHitResult Hit;
-	FVector TraceStart = FollowCamera->GetComponentTransform().GetLocation();
-	FRotator TraceDirection = GetControlRotation();
-	FVector TraceDestination = TraceStart + TraceDirection.Vector() * LockOnDistance;
-	FCollisionQueryParams params = FCollisionQueryParams(TEXT("LockOnTarget"), false, this);
-
-	if (GetWorld()->LineTraceSingleByObjectType(Hit, TraceStart, TraceDestination, FCollisionObjectQueryParams::AllObjects, params))
-	{
-		LockOnTargetRef = Cast<AActor>(Hit.GetActor());		
-		TraceDestination = (LockOnTargetRef) ? LockOnTargetRef->GetActorLocation() : Hit.Location;
-	}
-	else LockOnTargetRef = nullptr;
-
-	return TraceDestination;
-}
-
 void AAvatarWoCtCCharacter::LaunchForward()
 {
-	float VelocityMax = GetCharacterMovement()->MaxWalkSpeed * ((bRangedModeActive) ? RangedForwardVelocityFactor : LockOnLateralVelocityFactor);
+	float VelocityMax = GetCharacterMovement()->MaxWalkSpeed * RangedForwardVelocityFactor;
 	GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.Z * GetActorUpVector() + JumpDirection * VelocityMax;
 }
 
@@ -199,23 +167,17 @@ void AAvatarWoCtCCharacter::StartJump()
 
 	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
 	{
-		if (bLockOnModeActive) return;
-		else GetCharacterMovement()->JumpZVelocity = fDefaultJumpZVelocity;
+		GetCharacterMovement()->JumpZVelocity = fDefaultJumpZVelocity;
 	}
 	else
 	{
-		bJumpingForward = (bRangedModeActive || bLockOnModeActive);
+		bJumpingForward = bRangedModeActive;
 		JumpDirection = GetActorForwardVector();
 
 		if (bRangedModeActive)
 		{
 			GetCharacterMovement()->AirControl = RangedAirControlFactor;
 			GetCharacterMovement()->JumpZVelocity = RangedJumpVelocityFactor * fDefaultJumpZVelocity;
-		}
-		else if (bLockOnModeActive)
-		{
-			GetCharacterMovement()->GravityScale = LockOnGravityScale;
-			GetCharacterMovement()->AirControl = LockOnAirControlFactor;
 		}
 		else if (bGuardModeActive)
 		{
@@ -265,21 +227,9 @@ void AAvatarWoCtCCharacter::EndGuardMode()
 	if (!bIsGuardToggle && bGuardModeActive) StartGuardMode();
 }
 
-void AAvatarWoCtCCharacter::StartLockOnMode()
-{
-	bLockOnModeActive = !bLockOnModeActive;
-	
-	LockTarget = GetLockOnTarget();
-}
-
-void AAvatarWoCtCCharacter::EndLockOnMode()
-{
-	if (!bIsLockOnToggle && bLockOnModeActive) StartLockOnMode();
-}
-
 void AAvatarWoCtCCharacter::RequestLightAttack()
 {
-	if ((bRangedModeActive) /*|| bLockOnModeActive && 'range to target is larger than melee range'*/)
+	if (bRangedModeActive)
 	{
 		if (bGuardModeActive)
 		{

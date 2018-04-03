@@ -42,9 +42,6 @@ class AAvatarWoCtCCharacter : public ACharacter
 
 	float fDefaultMoveSpeed = 600.f;
 
-	AActor* LockOnTargetRef = nullptr;
-	FVector LockTarget;
-
 	FVector JumpDirection = FVector::ZeroVector;
 	float fDefaultJumpZVelocity = 600.f;
 	bool bJumpingForward = false;
@@ -77,11 +74,7 @@ private:
 
 	void CheckHover();
 
-	void FocusLockTarget();
-
 	void CenterCamera();
-
-	FVector GetLockOnTarget();
 
 	void LaunchForward();
 
@@ -109,13 +102,6 @@ protected:
 	float GuardJumpVelocityFactor = 2.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jumping|Guard")
 	float GuardAirControlFactor = 0.4f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jumping|LockOn")
-	float LockOnGravityScale = 3.f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jumping|LockOn")
-	float LockOnLateralVelocityFactor = 1.5f;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jumping|LockOn")
-	float LockOnAirControlFactor = 0.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jumping|Ranged")
 	float RangedJumpVelocityFactor = 1.5f;
@@ -148,16 +134,6 @@ protected:
 
 	void StartGuardMode();
 	void EndGuardMode();
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "LockOnMode")
-	bool bLockOnModeActive = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "LockOnMode")
-	bool bIsLockOnToggle = false;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "LockOnMode")
-	float LockOnDistance = 5000.f;
-
-	void StartLockOnMode();
-	void EndLockOnMode();
 
 	void RequestLightAttack();
 	void RequestHeavyAttack();
