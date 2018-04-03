@@ -47,6 +47,7 @@ class AAvatarWoCtCCharacter : public ACharacter
 	bool bJumpingForward = false;
 
 	FTimerHandle RollTimerHandle;
+	float fDefaultBrakingFrictionFactor = 2.f;
 
 public:
 	AAvatarWoCtCCharacter();
@@ -81,6 +82,7 @@ private:
 	void LaunchForward();
 
 	void RollComplete();
+	void RollCooldownComplete();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bending")
@@ -154,5 +156,12 @@ protected:
 
 	void StartRoll();
 	void EndRoll();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Roll")
+	int32 MaxRollCount = 2;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Roll")
+	float RollCooldown = 5.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Roll")
+	TArray<FTimerHandle> RollCooldownTimerHandles;
 };
 

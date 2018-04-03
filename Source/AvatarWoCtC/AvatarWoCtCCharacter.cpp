@@ -69,6 +69,8 @@ void AAvatarWoCtCCharacter::BeginPlay()
 	fDefaultMoveSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
 	fDefaultJumpZVelocity = GetCharacterMovement()->JumpZVelocity;
+
+	fDefaultBrakingFrictionFactor = GetCharacterMovement()->BrakingFrictionFactor;
 }
 
 void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
@@ -79,9 +81,9 @@ void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 	else if (bCanHover) CheckHover();
 
 
-	if (bRollActive) 
+	if (!bIsRolling && bRollActive && (MaxRollCount - RollCooldownTimerHandles.Num() != 0))
 	{
-		FVector MovementInput = FVector(GetInputAxisValue(FName("MoveForward")), GetInputAxisValue(FName("MoveRight")), 0.f);
+		FVector MovementInput = FVector(GetInputAxisValue(FName("MoveForward")), GetInputAxisValue(FName("MoveRight")), 0.f).GetSafeNormal();
 
 		if (MovementInput.Size() > 0.f)
 		{
@@ -89,8 +91,13 @@ void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 			FRotator RollDirection = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 
 			GetWorldTimerManager().SetTimer(RollTimerHandle, this, &AAvatarWoCtCCharacter::RollComplete, RollingSpeedDistance / RollingSpeedFactor);
+
+			FTimerHandle TempRollCooldown;
+			GetWorldTimerManager().SetTimer(TempRollCooldown, this, &AAvatarWoCtCCharacter::RollCooldownComplete, RollCooldown);
+			RollCooldownTimerHandles.Add(TempRollCooldown);
 			
 			GetCharacterMovement()->Velocity = RollDirection.RotateVector(MovementInput) * GetCharacterMovement()->MaxWalkSpeed * RollingSpeedFactor;
+			GetCharacterMovement()->BrakingFrictionFactor = 0.f;
 		}
 	}
 }
@@ -186,6 +193,15 @@ void AAvatarWoCtCCharacter::RollComplete()
 	bIsRolling = false;
 	bRollActive = false;
 	GetWorldTimerManager().ClearTimer(RollTimerHandle);
+
+	GetCharacterMovement()->Velocity = FVector::ZeroVector;
+	GetCharacterMovement()->BrakingFrictionFactor = fDefaultBrakingFrictionFactor;
+}
+
+void AAvatarWoCtCCharacter::RollCooldownComplete()
+{
+	GetWorldTimerManager().ClearTimer(RollCooldownTimerHandles[0]);
+	RollCooldownTimerHandles.RemoveAt(0);
 }
 
 void AAvatarWoCtCCharacter::StartJump()
