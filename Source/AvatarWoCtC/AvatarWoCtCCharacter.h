@@ -46,6 +46,8 @@ class AAvatarWoCtCCharacter : public ACharacter
 	float fDefaultJumpZVelocity = 600.f;
 	bool bJumpingForward = false;
 
+	FTimerHandle RollTimerHandle;
+
 public:
 	AAvatarWoCtCCharacter();
 	virtual void BeginPlay() override;
@@ -77,6 +79,8 @@ private:
 	void CenterCamera();
 
 	void LaunchForward();
+
+	void RollComplete();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bending")
@@ -138,5 +142,17 @@ protected:
 	void RequestLightAttack();
 	void RequestHeavyAttack();
 	void RequestStunAttack();
+
+	UPROPERTY(BlueprintReadOnly, Category = "Roll")
+	bool bRollActive = false;
+	UPROPERTY(BlueprintReadOnly, Category = "Roll")
+	bool bIsRolling = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Roll")
+	float RollingSpeedFactor = 3.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Roll")
+	float RollingSpeedDistance = 2.f;
+
+	void StartRoll();
+	void EndRoll();
 };
 

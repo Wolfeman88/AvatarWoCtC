@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "./MeleeAttackComponent.h"
+#include "TimerManager.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -76,6 +77,22 @@ void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
 	
 	if (bJumpingForward) LaunchForward();
 	else if (bCanHover) CheckHover();
+
+
+	if (bRollActive) 
+	{
+		FVector MovementInput = FVector(GetInputAxisValue(FName("MoveForward")), GetInputAxisValue(FName("MoveRight")), 0.f);
+
+		if (MovementInput.Size() > 0.f)
+		{
+			bIsRolling = true;
+			FRotator RollDirection = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+
+			GetWorldTimerManager().SetTimer(RollTimerHandle, this, &AAvatarWoCtCCharacter::RollComplete, RollingSpeedDistance / RollingSpeedFactor);
+			
+			GetCharacterMovement()->Velocity = RollDirection.RotateVector(MovementInput) * GetCharacterMovement()->MaxWalkSpeed * RollingSpeedFactor;
+		}
+	}
 }
 
 void AAvatarWoCtCCharacter::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
@@ -124,6 +141,9 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestLightAttack);
 	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestHeavyAttack);
 	PlayerInputComponent->BindAction("StunAttack", IE_Pressed, this, &AAvatarWoCtCCharacter::RequestStunAttack);
+
+	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &AAvatarWoCtCCharacter::StartRoll);
+	PlayerInputComponent->BindAction("Roll", IE_Released, this, &AAvatarWoCtCCharacter::EndRoll);
 }
 
 void AAvatarWoCtCCharacter::ChangeSpeedWhileActivatingAbility(float SpeedFactor)
@@ -159,6 +179,13 @@ void AAvatarWoCtCCharacter::LaunchForward()
 {
 	float VelocityMax = GetCharacterMovement()->MaxWalkSpeed * RangedForwardVelocityFactor;
 	GetCharacterMovement()->Velocity = GetCharacterMovement()->Velocity.Z * GetActorUpVector() + JumpDirection * VelocityMax;
+}
+
+void AAvatarWoCtCCharacter::RollComplete()
+{
+	bIsRolling = false;
+	bRollActive = false;
+	GetWorldTimerManager().ClearTimer(RollTimerHandle);
 }
 
 void AAvatarWoCtCCharacter::StartJump()
@@ -347,6 +374,16 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 	}
 }
 
+void AAvatarWoCtCCharacter::StartRoll()
+{
+	bRollActive = true;
+}
+
+void AAvatarWoCtCCharacter::EndRoll()
+{
+	bRollActive = false;
+}
+
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
@@ -371,6 +408,8 @@ void AAvatarWoCtCCharacter::RotatePitch(float Rate)
 
 void AAvatarWoCtCCharacter::MoveForward(float Value)
 {
+	if (bIsRolling) return;
+
 	if ((Controller != NULL) && (Value != 0.0f))
 	{
 		// find out which way is forward
@@ -385,6 +424,8 @@ void AAvatarWoCtCCharacter::MoveForward(float Value)
 
 void AAvatarWoCtCCharacter::MoveRight(float Value)
 {
+	if (bIsRolling) return;
+
 	if ( (Controller != NULL) && (Value != 0.0f) )
 	{
 		// find out which way is right
