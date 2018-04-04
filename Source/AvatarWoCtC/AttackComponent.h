@@ -16,6 +16,10 @@ enum class EAttackType : uint8
 	AT_Stun			UMETA(DisplayName = "StunAttack")
 };
 
+// TODO: make enum for distance and for width (uint8 offset by "OUTER" distance)
+// TODO: make struct FMeleeVector using enums above
+// TODO: update FMeleeTrace to use FMeleeVector instead of FVector
+
 USTRUCT(BlueprintType)
 struct FMeleeTrace : public FTableRowBase
 {
@@ -57,6 +61,7 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 
 	FVector GetRelativeVectorOffset(FVector Offset);
 	void EndAttack();
+	void ClearQueue();
 	
 	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
 
@@ -64,6 +69,11 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	FVector R_QueuedOffset = FVector::ZeroVector;
 	TSubclassOf<AActor> R_CurrentAttack = nullptr;
 	FVector R_CurrentOffset = FVector::ZeroVector;
+
+	TSubclassOf<AActor> DM_QueuedAttack = nullptr;
+	float DM_QueuedOffset = 0.f;
+	TSubclassOf<AActor> DM_CurrentAttack = nullptr;
+	float DM_CurrentOffset = 0.f;
 
 public:	
 	// Sets default values for this component's properties
@@ -77,6 +87,8 @@ public:
 	void ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack AttackData);
 	UFUNCTION(BlueprintCallable, Category = "Ranged")
 	void ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, FVector OriginationOffset);
+	UFUNCTION(BlueprintCallable, Category = "Defense - Melee")
+	void ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Timer")
 	float LightAttackActivationTime = 1.f;
@@ -114,4 +126,6 @@ protected:
 	void M_Stun();
 
 	void R_Attack();
+
+	void M_Defense();
 };

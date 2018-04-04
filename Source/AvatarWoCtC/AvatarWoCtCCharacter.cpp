@@ -296,7 +296,7 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 	{
 		if (bGuardModeActive)
 		{
-			// melee defense at target or in direction of target
+			AttackComp->ActivateMeleeDefenseAbility(MeleeLightDefense, 73.f);
 		}
 		else
 		{
@@ -345,7 +345,7 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 	{
 		if (bGuardModeActive)
 		{
-			// melee defense at target or in direction of target
+			AttackComp->ActivateMeleeDefenseAbility(MeleeHeavyDefense, 73.f);
 		}
 		else
 		{
@@ -382,7 +382,7 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 	{
 		if (bGuardModeActive)
 		{
-			// melee defense at target or in direction of target
+			AttackComp->ActivateMeleeDefenseAbility(MeleeStunDefense, 73.f);
 		}
 		else
 		{

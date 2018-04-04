@@ -172,5 +172,12 @@ protected:
 	TSubclassOf<AActor> RangedHeavyAttack = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
 	TSubclassOf<AActor> RangedStunAttack = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	TSubclassOf<AActor> MeleeLightDefense = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	TSubclassOf<AActor> MeleeHeavyDefense = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	TSubclassOf<AActor> MeleeStunDefense = nullptr;
 };
 

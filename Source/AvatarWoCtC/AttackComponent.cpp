@@ -37,6 +37,7 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
+		ClearQueue();
 		M_QueuedAttack = NewAttack;
 		M_QueuedAttackData = AttackData;
 		return;
@@ -76,6 +77,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, 
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
+		ClearQueue();
 		R_QueuedAttack = AttackToSpawn;
 		R_QueuedOffset = OriginationOffset;
 		return;
@@ -85,7 +87,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, 
 
 	if (AttackToSpawn)
 	{
-		// ranged attack enum and actor class
+		// TODO: ranged attack enum and actor class
 		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::R_Attack, 0.75f);
 		speedMultiplier = 0.1f;
 	}
@@ -99,32 +101,66 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, 
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
+void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset)
+{
+	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
+	{
+		ClearQueue();
+		DM_QueuedAttack = AttackToSpawn;
+		DM_QueuedOffset = OriginationOffset;
+		return;
+	}
+
+	float speedMultiplier = 1.f;
+
+	if (AttackToSpawn)
+	{
+		// TODO: ability enum and actor class
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Defense, 1.f);
+		speedMultiplier = 0.1f;
+	}
+
+	DM_CurrentAttack = AttackToSpawn;
+	DM_CurrentOffset = OriginationOffset;
+
+	DM_QueuedAttack = nullptr;
+	DM_QueuedOffset = 0.f;
+
+	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
+}
+
 void UAttackComponent::R_Attack()
 {
+	// TODO: ranged attacks should move toward reticle/target location
 	FVector SpawnLoc = GetRelativeVectorOffset(R_CurrentOffset);
 	FRotator SpawnRot = OwningCharacter->GetControlRotation();
 	FActorSpawnParameters params;
 	params.Owner = OwningCharacter;
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-	AActor* SpawnRef = GetWorld()->SpawnActor<AActor>(R_CurrentAttack, SpawnLoc, SpawnRot, params);
+	GetWorld()->SpawnActor<AActor>(R_CurrentAttack, SpawnLoc, SpawnRot, params);
 
-	GetOwner()->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
-	if (R_QueuedAttack != nullptr) ActivateRangedAbility(R_QueuedAttack, R_QueuedOffset);
-	else
-	{
-		R_CurrentAttack = nullptr;
-		R_QueuedOffset = FVector::ZeroVector;
-		OwningCharacter->ChangeSpeedWhileActivatingAbility(1.f);
-	}
+	EndAttack();
+}
 
-	SpawnRef = nullptr;
+void UAttackComponent::M_Defense()
+{
+	// TODO: ranged attacks should move toward reticle/target location
+	FVector SpawnLoc = GetRelativeVectorOffset(FVector(DM_CurrentOffset, 0.f, 0.f));
+	FRotator SpawnRot = OwningCharacter->GetActorForwardVector().ToOrientationRotator();
+	FActorSpawnParameters params;
+	params.Owner = OwningCharacter;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(DM_CurrentAttack, SpawnLoc, SpawnRot, params);
+
+	EndAttack();
 }
 
 FVector UAttackComponent::GetRelativeVectorOffset(FVector Offset)
 {
 	FVector ActorLocation = GetOwner()->GetActorLocation();
-
+	// TODO: use trace offsets and enum values to programatically compute in-game vectors
 	FVector OffsetX, OffsetY, OffsetZ;
 	OffsetX = GetOwner()->GetActorForwardVector() * Offset.X;
 	OffsetY = GetOwner()->GetActorRightVector() * Offset.Y;
@@ -137,12 +173,28 @@ void UAttackComponent::EndAttack()
 {
 	GetOwner()->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 	if (M_QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(M_QueuedAttack, M_QueuedAttackData);
+	else if (R_QueuedAttack != nullptr) ActivateRangedAbility(R_QueuedAttack, R_QueuedOffset);
+	else if (DM_QueuedAttack != nullptr) ActivateMeleeDefenseAbility(DM_QueuedAttack, DM_QueuedOffset);
 	else
 	{
 		M_CurrentAttack = EAttackType::AT_None;
 		M_CurrentAttackData = FMeleeAttack();
+		R_CurrentAttack = nullptr;
+		R_CurrentOffset = FVector::ZeroVector;
+		DM_CurrentAttack = nullptr;
+		DM_CurrentOffset = 0.f;
 		OwningCharacter->ChangeSpeedWhileActivatingAbility(1.f);
 	}
+}
+
+void UAttackComponent::ClearQueue()
+{
+	M_QueuedAttack = EAttackType::AT_None;
+	M_QueuedAttackData = FMeleeAttack();
+	R_QueuedAttack = nullptr;
+	R_QueuedOffset = FVector::ZeroVector;
+	DM_QueuedAttack = nullptr;
+	DM_QueuedOffset = 0.f;
 }
 
 void UAttackComponent::M_Light()
