@@ -217,6 +217,8 @@ void AAvatarWoCtCCharacter::StartJump()
 {
 	bJumpHeld = true;
 
+	if (bIsRolling) return;
+
 	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
 	{
 		GetCharacterMovement()->JumpZVelocity = fDefaultJumpZVelocity;
