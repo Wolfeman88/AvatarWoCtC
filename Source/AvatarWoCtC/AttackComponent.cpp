@@ -129,6 +129,34 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToS
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
+void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset)
+{
+	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
+	{
+		ClearQueue();
+		DR_QueuedAttack = AttackToSpawn;
+		DR_QueuedOffset = OriginationOffset;
+		return;
+	}
+
+	float speedMultiplier = 1.f;
+
+	if (AttackToSpawn)
+	{
+		// TODO: ability enum and actor class
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::R_Defense, 1.f);
+		speedMultiplier = 0.1f;
+	}
+
+	DR_CurrentAttack = AttackToSpawn;
+	DR_CurrentOffset = OriginationOffset;
+
+	DR_QueuedAttack = nullptr;
+	DR_QueuedOffset = 0.f;
+
+	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
+}
+
 void UAttackComponent::R_Attack()
 {
 	// TODO: ranged attacks should move toward reticle/target location
@@ -153,6 +181,20 @@ void UAttackComponent::M_Defense()
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	GetWorld()->SpawnActor<AActor>(DM_CurrentAttack, SpawnLoc, SpawnRot, params);
+
+	EndAttack();
+}
+
+void UAttackComponent::R_Defense()
+{
+	// TODO: ranged attacks should move toward reticle/target location
+	FVector SpawnLoc = OwningCharacter->GetActorLocation() + OwningCharacter->GetControlRotation().Vector() * DR_CurrentOffset;
+	FRotator SpawnRot = OwningCharacter->GetControlRotation();
+	FActorSpawnParameters params;
+	params.Owner = OwningCharacter;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	GetWorld()->SpawnActor<AActor>(DR_CurrentAttack, SpawnLoc, SpawnRot, params);
 
 	EndAttack();
 }

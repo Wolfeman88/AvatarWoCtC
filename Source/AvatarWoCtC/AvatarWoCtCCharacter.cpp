@@ -11,6 +11,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "./AttackComponent.h"
 #include "TimerManager.h"
+#include "DrawDebugHelpers.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -284,7 +285,18 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 	{
 		if (bGuardModeActive)
 		{
-			// ranged defense at target or in direction of target
+			FHitResult Hit;
+			FVector TraceStart = FollowCamera->GetComponentLocation();
+			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+
+			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, FCollisionObjectQueryParams::AllObjects))
+			{
+				AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, Hit.Distance - CameraBoom->TargetArmLength);
+			}
+			else
+			{
+				AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, (73.f * 20) - CameraBoom->TargetArmLength);
+			}
 		}
 		else
 		{
@@ -333,7 +345,18 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 	{
 		if (bGuardModeActive)
 		{
-			// ranged defense at target or in direction of target
+			FHitResult Hit;
+			FVector TraceStart = FollowCamera->GetComponentLocation();
+			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+
+			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, FCollisionObjectQueryParams::AllObjects))
+			{
+				AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, Hit.Distance - CameraBoom->TargetArmLength);
+			}
+			else
+			{
+				AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, (73.f * 20) - CameraBoom->TargetArmLength);
+			}
 		}
 		else
 		{
@@ -370,7 +393,18 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 	{
 		if (bGuardModeActive)
 		{
-			// ranged defense at target or in direction of target
+			FHitResult Hit;
+			FVector TraceStart = FollowCamera->GetComponentLocation();
+			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+
+			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, FCollisionObjectQueryParams::AllObjects))
+			{
+				AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, Hit.Distance - CameraBoom->TargetArmLength);
+			}
+			else
+			{
+				AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, (73.f * 20) - CameraBoom->TargetArmLength);
+			}
 		}
 		else
 		{

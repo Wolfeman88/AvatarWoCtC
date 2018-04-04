@@ -75,6 +75,11 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	TSubclassOf<AActor> DM_CurrentAttack = nullptr;
 	float DM_CurrentOffset = 0.f;
 
+	TSubclassOf<AActor> DR_QueuedAttack = nullptr;
+	float DR_QueuedOffset = 0.f;
+	TSubclassOf<AActor> DR_CurrentAttack = nullptr;
+	float DR_CurrentOffset = 0.f;
+
 public:	
 	// Sets default values for this component's properties
 	UAttackComponent();
@@ -89,6 +94,8 @@ public:
 	void ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, FVector OriginationOffset);
 	UFUNCTION(BlueprintCallable, Category = "Defense - Melee")
 	void ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset);
+	UFUNCTION(BlueprintCallable, Category = "Defense - Ranged")
+	void ActivateRangedDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Timer")
 	float LightAttackActivationTime = 1.f;
@@ -128,4 +135,6 @@ protected:
 	void R_Attack();
 
 	void M_Defense();
+
+	void R_Defense();
 };
