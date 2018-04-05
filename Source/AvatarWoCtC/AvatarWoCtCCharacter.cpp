@@ -289,7 +289,7 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 		{
 			FHitResult Hit;
 			FVector TraceStart = FollowCamera->GetComponentLocation();
-			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor);
 			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Light"), false, this);
 
 			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
@@ -298,20 +298,20 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 			}
 			else
 			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, (73.f * 20) - CameraBoom->TargetArmLength);
+				AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor) - CameraBoom->TargetArmLength);
 			}
 		}
 		else
 		{
 			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
-			AttackComp->ActivateRangedAbility(RangedLightAttack, FVector(0.f, y_offset_sign * 88.f, 44.f));
+			AttackComp->ActivateRangedAbility(RangedLightAttack, FVector(0.f, y_offset_sign * (float)EWidthPoints::DP_Outer_Pos, (float)EWidthPoints::DP_Outer_Neg));
 		}
 	}
 	else
 	{
 		if (bGuardModeActive)
 		{
-			AttackComp->ActivateMeleeDefenseAbility(MeleeLightDefense, 73.f);
+			AttackComp->ActivateMeleeDefenseAbility(MeleeLightDefense, (float)EDistancePoints::DP_Close);
 		}
 		else
 		{
@@ -329,7 +329,7 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 		{
 			FHitResult Hit;
 			FVector TraceStart = FollowCamera->GetComponentLocation();
-			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor);
 			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Heavy"), false, this);
 
 			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
@@ -338,20 +338,20 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 			}
 			else
 			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, (73.f * 20) - CameraBoom->TargetArmLength);
+				AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor) - CameraBoom->TargetArmLength);
 			}
 		}
 		else
 		{
 			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
-			AttackComp->ActivateRangedAbility(RangedHeavyAttack, FVector(0.f, y_offset_sign * 88.f, 44.f));
+			AttackComp->ActivateRangedAbility(RangedHeavyAttack, FVector(0.f, y_offset_sign * (float)EWidthPoints::DP_Outer_Pos, (float)EWidthPoints::DP_Outer_Neg));
 		}
 	}
 	else
 	{
 		if (bGuardModeActive)
 		{
-			AttackComp->ActivateMeleeDefenseAbility(MeleeHeavyDefense, 73.f);
+			AttackComp->ActivateMeleeDefenseAbility(MeleeHeavyDefense, (float)EDistancePoints::DP_Close);
 		}
 		else
 		{
@@ -369,7 +369,7 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 		{
 			FHitResult Hit;
 			FVector TraceStart = FollowCamera->GetComponentLocation();
-			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor);
 			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Stun"), false, this);
 
 			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
@@ -378,20 +378,20 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 			}
 			else
 			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, (73.f * 20) - CameraBoom->TargetArmLength);
+				AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor) - CameraBoom->TargetArmLength);
 			}
 		}
 		else
 		{
 			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
-			AttackComp->ActivateRangedAbility(RangedStunAttack, FVector(0.f, y_offset_sign * 88.f, 44.f));
+			AttackComp->ActivateRangedAbility(RangedStunAttack, FVector(0.f, y_offset_sign * (float)EWidthPoints::DP_Outer_Pos, (float)EWidthPoints::DP_Outer_Neg));
 		}
 	}
 	else
 	{
 		if (bGuardModeActive)
 		{
-			AttackComp->ActivateMeleeDefenseAbility(MeleeStunDefense, 73.f);
+			AttackComp->ActivateMeleeDefenseAbility(MeleeStunDefense, (float)EDistancePoints::DP_Close);
 		}
 		else
 		{

@@ -167,17 +167,19 @@ protected:
 	TArray<FTimerHandle> RollCooldownTimerHandles;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	float MaxRangeDistanceFactor = 20.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
 	TSubclassOf<AActor> RangedLightAttack = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
 	TSubclassOf<AActor> RangedHeavyAttack = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
 	TSubclassOf<AActor> RangedStunAttack = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Defense - Melee")
 	TSubclassOf<AActor> MeleeLightDefense = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Defense - Melee")
 	TSubclassOf<AActor> MeleeHeavyDefense = nullptr;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Defense - Melee")
 	TSubclassOf<AActor> MeleeStunDefense = nullptr;
 };
 
