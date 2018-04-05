@@ -16,14 +16,50 @@ enum class EAttackType : uint8
 	AT_Stun			UMETA(DisplayName = "StunAttack")
 };
 
-// TODO: make enum for distance and for width (uint8 offset by "OUTER" distance)
-// TODO: make struct FMeleeVector using enums above
-// TODO: update FMeleeTrace to use FMeleeVector instead of FVector
+UENUM(BlueprintType)
+enum class EDistancePoints : uint8
+{
+	DP_None = 0		UMETA(Display = "No Offset"),
+	DP_Close = 73	UMETA(Display = "Close"),
+	DP_Middle = 146	UMETA(Display = "Middle"),
+	DP_Far = 219	UMETA(Display = "Far")
+};
+
+UENUM(BlueprintType)
+enum class EWidthPoints : uint8
+{
+	DP_Outer_Neg = 0	UMETA(Display = "Negative Outer"),
+	DP_Inner_Neg = 44	UMETA(Display = "Negative Inner"),
+	DP_None = 88		UMETA(Display = "No Offset"),
+	DP_Inner_Pos = 132	UMETA(Display = "Positive Inner"),
+	DP_Outer_Pos = 176	UMETA(Display = "Positive Outer")
+};
+
+USTRUCT(BlueprintType)
+struct FMeleeVector : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Data")
+	EDistancePoints ForwardOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Data")
+	EWidthPoints RightOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Data")
+	EWidthPoints UpOffset;
+};
 
 USTRUCT(BlueprintType)
 struct FMeleeTrace : public FTableRowBase
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Data")
+	FMeleeVector Source;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Data")
+	FMeleeVector End;
 
 	UPROPERTY()
 	FVector TraceSource;
@@ -38,10 +74,10 @@ struct FMeleeAttack : public FTableRowBase
 	GENERATED_BODY()
 
 	// sets of line trace start and end vectors that represent up the attack
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Data")
 	TArray<FMeleeTrace> Traces;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Melee Attack Data")
 	float Damage = 0.f;
 
 	// EConditionEffect Condition = Knockback, Stagger, Stun, Doused, Knockdown, Frozen, etc.
@@ -115,18 +151,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack Timer")
 	FTimerHandle AttackTimerHandle;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Range")
-	float Close = 73.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Range")
-	float Middle = 146.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Range")
-	float Max = 219.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Width")
-	float Inner = 44.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Width")
-	float Outer = 88.f;
 
 	void M_Light();
 	void M_Heavy();
