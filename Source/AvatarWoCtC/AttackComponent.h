@@ -152,6 +152,13 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Attack Timer")
 	FTimerHandle AttackTimerHandle;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
+	class UDataTable* LightAttackData;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
+	UDataTable* HeavyAttackData;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
+	UDataTable* StunAttackData;
+
 	void M_Light();
 	void M_Heavy();
 	void M_Stun();

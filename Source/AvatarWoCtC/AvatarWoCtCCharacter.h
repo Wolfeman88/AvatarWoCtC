@@ -179,12 +179,5 @@ protected:
 	TSubclassOf<AActor> MeleeHeavyDefense = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
 	TSubclassOf<AActor> MeleeStunDefense = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
-	class UDataTable* LightAttackData;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
-	UDataTable* HeavyAttackData;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
-	UDataTable* StunAttackData;
 };
 
