@@ -7,6 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "AvatarWoCtCCharacter.h"
 #include "Camera/CameraComponent.h"
+#include "Engine/DataTable.h"
 
 // Sets default values for this component's properties
 UAttackComponent::UAttackComponent()
@@ -157,6 +158,41 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<AActor> AttackTo
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
+FMeleeAttack UAttackComponent::GetRandomAttackData(EAttackType AttackStyle)
+{
+	FMeleeAttack attack = FMeleeAttack();
+	UDataTable* RequestDataTableRef = nullptr;
+
+	switch (AttackStyle)
+	{
+	case EAttackType::AT_Light:
+		RequestDataTableRef = LightAttackData;
+		break;
+	case EAttackType::AT_Heavy:
+		RequestDataTableRef = HeavyAttackData;
+		break;
+	case EAttackType::AT_Stun:
+		RequestDataTableRef = StunAttackData;
+		break;
+	case EAttackType::AT_None:
+	default:
+		break;
+	}
+
+	if (RequestDataTableRef != nullptr)
+	{
+		TArray<FName> RowNames = RequestDataTableRef->GetRowNames();
+
+		if (RowNames.Num() != 0)
+		{
+			int32 index = FMath::RandRange(0, RowNames.Num() - 1);
+			attack = *RequestDataTableRef->FindRow<FMeleeAttack>(RowNames[index], RowNames[index].ToString());
+		}
+	}
+
+	return attack;
+}
+
 void UAttackComponent::R_Attack()
 {
 	// TODO: ranged attacks should move toward reticle/target location
@@ -199,10 +235,21 @@ void UAttackComponent::R_Defense()
 	EndAttack();
 }
 
+FVector UAttackComponent::ConvertMeleeVector(FMeleeVector EnumOffset)
+{
+	FVector rVec = FVector::ZeroVector;
+
+	rVec.X = (float)EnumOffset.ForwardOffset;
+	rVec.Y = (float)EnumOffset.RightOffset - (float)EWidthPoints::DP_None;
+	rVec.Z = (float)EnumOffset.UpOffset - (float)EWidthPoints::DP_None;
+
+	return rVec;
+}
+
 FVector UAttackComponent::GetRelativeVectorOffset(FVector Offset)
 {
 	FVector ActorLocation = GetOwner()->GetActorLocation();
-	// TODO: use trace offsets and enum values to programatically compute in-game vectors
+
 	FVector OffsetX, OffsetY, OffsetZ;
 	OffsetX = GetOwner()->GetActorForwardVector() * Offset.X;
 	OffsetY = GetOwner()->GetActorRightVector() * Offset.Y;
@@ -245,8 +292,8 @@ void UAttackComponent::M_Light()
 
 	for (int i = 0; i < traces.Num(); i++)
 	{
-		FVector Source = GetRelativeVectorOffset(traces[i].TraceSource);
-		FVector End = GetRelativeVectorOffset(traces[i].TraceEnd);
+		FVector Source = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].Source));
+		FVector End = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].End));
 
 		DrawDebugLine(GetWorld(), Source, End, FColor::Blue, false, 5.f, 0, 5.f);
 	}
@@ -260,8 +307,8 @@ void UAttackComponent::M_Heavy()
 
 	for (int i = 0; i < traces.Num(); i++)
 	{
-		FVector Source = GetRelativeVectorOffset(traces[i].TraceSource);
-		FVector End = GetRelativeVectorOffset(traces[i].TraceEnd);
+		FVector Source = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].Source));
+		FVector End = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].End));
 
 		DrawDebugLine(GetWorld(), Source, End, FColor::Red, false, 5.f, 0, 20.f);
 	}
@@ -275,8 +322,8 @@ void UAttackComponent::M_Stun()
 
 	for (int i = 0; i < traces.Num(); i++)
 	{
-		FVector Source = GetRelativeVectorOffset(traces[i].TraceSource);
-		FVector End = GetRelativeVectorOffset(traces[i].TraceEnd);
+		FVector Source = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].Source));
+		FVector End = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].End));
 
 		DrawDebugLine(GetWorld(), Source, End, FColor::Green, false, 5.f, 0, 2.5f);
 	}

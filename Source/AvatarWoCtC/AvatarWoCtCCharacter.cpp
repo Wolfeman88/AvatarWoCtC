@@ -290,8 +290,9 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 			FHitResult Hit;
 			FVector TraceStart = FollowCamera->GetComponentLocation();
 			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Light"), false, this);
 
-			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, FCollisionObjectQueryParams::AllObjects))
+			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
 			{
 				AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, Hit.Distance - CameraBoom->TargetArmLength);
 			}
@@ -314,28 +315,7 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 		}
 		else
 		{
-			// melee attack at target or in direction of target
-			// make data tables of possible trace arrays, randomly choose
-			FMeleeTrace DefaultTrace;
-			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
-			DefaultTrace.TraceEnd = FVector(219.f, 0.f, 0.f);
-
-			FMeleeAttack newAtk;
-			newAtk.Damage = 10.f;
-			newAtk.Traces.Add(DefaultTrace);
-			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
-			DefaultTrace.TraceEnd = FVector(146.f, 44.f, 0.f);
-			newAtk.Traces.Add(DefaultTrace);
-			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
-			DefaultTrace.TraceEnd = FVector(146.f, -44.f, 0.f);
-			newAtk.Traces.Add(DefaultTrace);
-			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
-			DefaultTrace.TraceEnd = FVector(146.f, 0.f, 44.f);
-			newAtk.Traces.Add(DefaultTrace);
-			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
-			DefaultTrace.TraceEnd = FVector(146.f, 0.f, -44.f);
-			newAtk.Traces.Add(DefaultTrace);
-
+			FMeleeAttack newAtk = AttackComp->GetRandomAttackData(EAttackType::AT_Light);
 			AttackComp->ActivateMeleeAbility(EAttackType::AT_Light, newAtk);
 		}
 	}
@@ -350,8 +330,9 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 			FHitResult Hit;
 			FVector TraceStart = FollowCamera->GetComponentLocation();
 			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Heavy"), false, this);
 
-			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, FCollisionObjectQueryParams::AllObjects))
+			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
 			{
 				AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, Hit.Distance - CameraBoom->TargetArmLength);
 			}
@@ -374,16 +355,7 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 		}
 		else
 		{
-			// melee attack at target or in direction of target
-			// make data tables of possible trace arrays, randomly choose
-			FMeleeTrace DefaultTrace;
-			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
-			DefaultTrace.TraceEnd = FVector(219.f, 0.f, 0.f);
-
-			FMeleeAttack newAtk;
-			newAtk.Damage = 20.f;
-			newAtk.Traces.Add(DefaultTrace);
-
+			FMeleeAttack newAtk = AttackComp->GetRandomAttackData(EAttackType::AT_Heavy);
 			AttackComp->ActivateMeleeAbility(EAttackType::AT_Heavy, newAtk);
 		}
 	}
@@ -398,8 +370,9 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 			FHitResult Hit;
 			FVector TraceStart = FollowCamera->GetComponentLocation();
 			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * (73.f * 20);
+			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Stun"), false, this);
 
-			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, FCollisionObjectQueryParams::AllObjects))
+			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
 			{
 				AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, Hit.Distance - CameraBoom->TargetArmLength);
 			}
@@ -422,16 +395,7 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 		}
 		else
 		{
-			// melee attack at target or in direction of target
-			// make data tables of possible trace arrays, randomly choose
-			FMeleeTrace DefaultTrace;
-			DefaultTrace.TraceSource = FVector(0.f, 0.f, 0.f);
-			DefaultTrace.TraceEnd = FVector(219.f, 0.f, 0.f);
-
-			FMeleeAttack newAtk;
-			newAtk.Damage = 5.f;
-			newAtk.Traces.Add(DefaultTrace);
-
+			FMeleeAttack newAtk = AttackComp->GetRandomAttackData(EAttackType::AT_Stun);
 			AttackComp->ActivateMeleeAbility(EAttackType::AT_Stun, newAtk);
 		}
 	}

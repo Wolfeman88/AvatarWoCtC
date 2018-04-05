@@ -95,6 +95,7 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	EAttackType M_CurrentAttack = EAttackType::AT_None;
 	FMeleeAttack M_CurrentAttackData;
 
+	FVector ConvertMeleeVector(FMeleeVector EnumOffset);
 	FVector GetRelativeVectorOffset(FVector Offset);
 	void EndAttack();
 	void ClearQueue();
@@ -132,6 +133,9 @@ public:
 	void ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset);
 	UFUNCTION(BlueprintCallable, Category = "Defense - Ranged")
 	void ActivateRangedDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset);
+
+	UFUNCTION(BlueprintCallable, Category = "Melee")
+	FMeleeAttack GetRandomAttackData(EAttackType AttackStyle);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Timer")
 	float LightAttackActivationTime = 1.f;
