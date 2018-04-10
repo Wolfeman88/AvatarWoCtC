@@ -224,7 +224,7 @@ void AAvatarWoCtCCharacter::StartJump()
 {
 	bJumpHeld = true;
 
-	if (bIsRolling) return;
+	if (bIsRolling || AttackComp->GetAttackTimerActive()) return;
 
 	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
 	{
@@ -410,6 +410,7 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 
 void AAvatarWoCtCCharacter::StartRoll()
 {
+	if (AttackComp->GetAttackTimerActive()) return;
 	if ((GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling) && (BendingDiscipline != EBendingDisciplineType::BDT_Air)) return;
 
 	bRollActive = true;
