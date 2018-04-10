@@ -8,6 +8,7 @@
 #include "AvatarWoCtCCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Engine/DataTable.h"
+#include "./AttackClasses/SpawnableAttack.h"
 
 // Sets default values for this component's properties
 UAttackComponent::UAttackComponent()
@@ -74,7 +75,7 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
-void UAttackComponent::ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, FVector OriginationOffset)
+void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> AttackToSpawn, FVector OriginationOffset)
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
@@ -88,9 +89,29 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, 
 
 	if (AttackToSpawn)
 	{
-		// TODO: ranged attack enum and actor class
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::R_Attack, 0.75f);
-		speedMultiplier = 0.1f;
+		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->Type;
+		float activation_time = 1.f;
+
+		switch (temp_type)
+		{
+		case EAttackType::AT_Light:
+			activation_time = LightAttackActivationTime;
+			speedMultiplier = LightAttackSpeedFactor;
+			break;
+		case EAttackType::AT_Heavy:
+			activation_time = HeavyAttackActivationTime;
+			speedMultiplier = HeavyAttackSpeedFactor;
+			break;
+		case EAttackType::AT_Stun:
+			activation_time = StunAttackActivationTime;
+			speedMultiplier = StunAttackSpeedFactor;
+			break;
+		case EAttackType::AT_None:
+		default:
+			break;
+		}
+
+		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::R_Attack, activation_time);
 	}
 
 	R_CurrentAttack = AttackToSpawn;
@@ -102,7 +123,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, 
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
-void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset)
+void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack> AttackToSpawn, float OriginationOffset)
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
@@ -116,9 +137,29 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToS
 
 	if (AttackToSpawn)
 	{
-		// TODO: ability enum and actor class
+		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->Type;
+		float activation_time = 1.f;
+
+		switch (temp_type)
+		{
+		case EAttackType::AT_Light:
+			activation_time = LightAttackActivationTime;
+			speedMultiplier = LightAttackSpeedFactor;
+			break;
+		case EAttackType::AT_Heavy:
+			activation_time = HeavyAttackActivationTime;
+			speedMultiplier = HeavyAttackSpeedFactor;
+			break;
+		case EAttackType::AT_Stun:
+			activation_time = StunAttackActivationTime;
+			speedMultiplier = StunAttackSpeedFactor;
+			break;
+		case EAttackType::AT_None:
+		default:
+			break;
+		}
+
 		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Defense, 1.f);
-		speedMultiplier = 0.1f;
 	}
 
 	DM_CurrentAttack = AttackToSpawn;
@@ -130,7 +171,7 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToS
 	OwningCharacter->ChangeSpeedWhileActivatingAbility(speedMultiplier);
 }
 
-void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset)
+void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack> AttackToSpawn, float OriginationOffset)
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
 	{
@@ -144,9 +185,29 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<AActor> AttackTo
 
 	if (AttackToSpawn)
 	{
-		// TODO: ability enum and actor class
+		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->Type;
+		float activation_time = 1.f;
+
+		switch (temp_type)
+		{
+		case EAttackType::AT_Light:
+			activation_time = LightAttackActivationTime;
+			speedMultiplier = LightAttackSpeedFactor;
+			break;
+		case EAttackType::AT_Heavy:
+			activation_time = HeavyAttackActivationTime;
+			speedMultiplier = HeavyAttackSpeedFactor;
+			break;
+		case EAttackType::AT_Stun:
+			activation_time = StunAttackActivationTime;
+			speedMultiplier = StunAttackSpeedFactor;
+			break;
+		case EAttackType::AT_None:
+		default:
+			break;
+		}
+
 		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::R_Defense, 1.f);
-		speedMultiplier = 0.1f;
 	}
 
 	DR_CurrentAttack = AttackToSpawn;

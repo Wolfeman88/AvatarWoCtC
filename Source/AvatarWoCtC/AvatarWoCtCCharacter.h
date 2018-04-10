@@ -176,18 +176,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
 	float MaxRangeDistanceFactor = 20.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
-	TSubclassOf<AActor> RangedLightAttack = nullptr;
+	TSubclassOf<class ASpawnableAttack> RangedLightAttack = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
-	TSubclassOf<AActor> RangedHeavyAttack = nullptr;
+	TSubclassOf<ASpawnableAttack> RangedHeavyAttack = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
-	TSubclassOf<AActor> RangedStunAttack = nullptr;
+	TSubclassOf<ASpawnableAttack> RangedStunAttack = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Defense - Melee")
-	TSubclassOf<AActor> MeleeLightDefense = nullptr;
+	TSubclassOf<ASpawnableAttack> MeleeLightDefense = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Defense - Melee")
-	TSubclassOf<AActor> MeleeHeavyDefense = nullptr;
+	TSubclassOf<ASpawnableAttack> MeleeHeavyDefense = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Defense - Melee")
-	TSubclassOf<AActor> MeleeStunDefense = nullptr;
+	TSubclassOf<ASpawnableAttack> MeleeStunDefense = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Roll")
 	float RollEnergyCost = 20.f;

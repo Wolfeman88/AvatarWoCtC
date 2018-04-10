@@ -102,19 +102,19 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	
 	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
 
-	TSubclassOf<AActor> R_QueuedAttack = nullptr;
+	TSubclassOf<class ASpawnableAttack> R_QueuedAttack = nullptr;
 	FVector R_QueuedOffset = FVector::ZeroVector;
-	TSubclassOf<AActor> R_CurrentAttack = nullptr;
+	TSubclassOf<ASpawnableAttack> R_CurrentAttack = nullptr;
 	FVector R_CurrentOffset = FVector::ZeroVector;
 
-	TSubclassOf<AActor> DM_QueuedAttack = nullptr;
+	TSubclassOf<ASpawnableAttack> DM_QueuedAttack = nullptr;
 	float DM_QueuedOffset = 0.f;
-	TSubclassOf<AActor> DM_CurrentAttack = nullptr;
+	TSubclassOf<ASpawnableAttack> DM_CurrentAttack = nullptr;
 	float DM_CurrentOffset = 0.f;
 
-	TSubclassOf<AActor> DR_QueuedAttack = nullptr;
+	TSubclassOf<ASpawnableAttack> DR_QueuedAttack = nullptr;
 	float DR_QueuedOffset = 0.f;
-	TSubclassOf<AActor> DR_CurrentAttack = nullptr;
+	TSubclassOf<ASpawnableAttack> DR_CurrentAttack = nullptr;
 	float DR_CurrentOffset = 0.f;
 
 public:	
@@ -128,11 +128,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Melee")
 	void ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack AttackData);
 	UFUNCTION(BlueprintCallable, Category = "Ranged")
-	void ActivateRangedAbility(TSubclassOf<AActor> AttackToSpawn, FVector OriginationOffset);
+	void ActivateRangedAbility(TSubclassOf<ASpawnableAttack> AttackToSpawn, FVector OriginationOffset);
 	UFUNCTION(BlueprintCallable, Category = "Defense - Melee")
-	void ActivateMeleeDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset);
+	void ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack> AttackToSpawn, float OriginationOffset);
 	UFUNCTION(BlueprintCallable, Category = "Defense - Ranged")
-	void ActivateRangedDefenseAbility(TSubclassOf<AActor> AttackToSpawn, float OriginationOffset);
+	void ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack> AttackToSpawn, float OriginationOffset);
 
 	UFUNCTION(BlueprintCallable, Category = "Melee")
 	FMeleeAttack GetRandomAttackData(EAttackType AttackStyle);
