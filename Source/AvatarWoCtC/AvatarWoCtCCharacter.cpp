@@ -149,10 +149,13 @@ void AAvatarWoCtCCharacter::ChangeSpeedWhileActivatingAbility(float SpeedFactor)
 
 void AAvatarWoCtCCharacter::CheckHover()
 {
+	VitalsComp->bIsEnergyDisabled = false;
+
 	if (bJumpHeld && GetVelocity().Z < 0.f && GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
 	{
 		GetCharacterMovement()->GravityScale = HoverGravityScale;
 		GetCharacterMovement()->AirControl = HoverAirControl;
+		VitalsComp->bIsEnergyDisabled = true;
 	}
 }
 
@@ -200,6 +203,8 @@ void AAvatarWoCtCCharacter::ActivateRoll()
 		GetCharacterMovement()->Velocity = RollDirection.RotateVector(MovementInput) * GetCharacterMovement()->MaxWalkSpeed * RollingSpeedFactor;
 		GetCharacterMovement()->BrakingFrictionFactor = 0.f;
 		GetCharacterMovement()->GravityScale = (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling) ? 0.f : fDefaultGravityScale;
+
+		VitalsComp->UpdateEnergy(-RollEnergyCost);
 	}
 }
 
@@ -225,15 +230,21 @@ void AAvatarWoCtCCharacter::StartJump()
 	bJumpHeld = true;
 
 	if (bIsRolling || AttackComp->GetAttackTimerActive()) return;
+	if (VitalsComp->GetCurrentEnergy() < JumpEnergyCost) return;
+
+	float e_cost = -LaunchEnergyCost;
 
 	if (GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling)
 	{
 		GetCharacterMovement()->JumpZVelocity = fDefaultJumpZVelocity;
+		e_cost = -JumpEnergyCost;
 	}
 	else
 	{
 		bJumpingForward = bRangedModeActive;
 		JumpDirection = GetActorForwardVector();
+
+		if ((bRangedModeActive || bGuardModeActive) && (VitalsComp->GetCurrentEnergy() < LaunchEnergyCost)) return;
 
 		if (bRangedModeActive)
 		{
@@ -245,7 +256,10 @@ void AAvatarWoCtCCharacter::StartJump()
 			GetCharacterMovement()->AirControl = GuardAirControlFactor;
 			GetCharacterMovement()->JumpZVelocity = GuardJumpVelocityFactor * fDefaultJumpZVelocity;
 		}
+		else e_cost = -JumpEnergyCost;
 	}
+
+	if (JumpCurrentCount < JumpMaxCount) VitalsComp->UpdateEnergy(e_cost); 
 
 	Jump();
 }
@@ -412,6 +426,7 @@ void AAvatarWoCtCCharacter::StartRoll()
 {
 	if (AttackComp->GetAttackTimerActive()) return;
 	if ((GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Falling) && (BendingDiscipline != EBendingDisciplineType::BDT_Air)) return;
+	if (VitalsComp->GetCurrentEnergy() < RollEnergyCost) return;
 
 	bRollActive = true;
 }

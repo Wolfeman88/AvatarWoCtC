@@ -41,7 +41,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
 	float HealthRegenPerSecond = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Energy")
-	float EnergyRegenPerSecond = 15.f;
+	float EnergyRegenPerSecond = 10.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
 	float JingCenteringPerSecond = 5.f;
 
@@ -63,6 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Jing")
 	float GetNormalizedMaxJing() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Energy")
+	FORCEINLINE float GetCurrentEnergy() const { return CurrentEnergy; }
+
 	// set corresponding vital and return new value
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	float UpdateHealth(float HealthDelta);
@@ -72,4 +75,8 @@ public:
 	// set corresponding vital and return new value
 	UFUNCTION(BlueprintCallable, Category = "Jing")
 	float UpdateJing(float JingDelta);	
+
+
+	UPROPERTY(BlueprintReadOnly, Category = "Energy")
+	bool bIsEnergyDisabled = false;
 };

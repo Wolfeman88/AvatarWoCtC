@@ -33,7 +33,7 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (!bWasAttackedRecently) UpdateHealth(HealthRegenPerSecond * DeltaTime);
 
-	CurrentEnergy = UpdateEnergy(EnergyRegenPerSecond * DeltaTime);
+	if (!bIsEnergyDisabled) CurrentEnergy = UpdateEnergy(EnergyRegenPerSecond * DeltaTime);
 
 	if (!OwningCharacter->GetAttackTimerActive()) Jing = (UKismetMathLibrary::NearlyEqual_FloatFloat(Jing, 0.f, 1.f)) ? 0.f : Jing - (JingCenteringPerSecond * DeltaTime);
 }

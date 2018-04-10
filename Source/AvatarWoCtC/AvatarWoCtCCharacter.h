@@ -186,5 +186,12 @@ protected:
 	TSubclassOf<AActor> MeleeHeavyDefense = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Defense - Melee")
 	TSubclassOf<AActor> MeleeStunDefense = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Roll")
+	float RollEnergyCost = 20.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jump")
+	float JumpEnergyCost = 25.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jump")
+	float LaunchEnergyCost = 75.f;
 };
 
