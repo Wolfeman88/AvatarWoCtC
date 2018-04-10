@@ -135,6 +135,11 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("Roll", IE_Released, this, &AAvatarWoCtCCharacter::EndRoll);
 }
 
+bool AAvatarWoCtCCharacter::GetAttackTimerActive() const
+{
+	return AttackComp->GetAttackTimerActive();
+}
+
 void AAvatarWoCtCCharacter::ChangeSpeedWhileActivatingAbility(float SpeedFactor)
 {
 	GetCharacterMovement()->MaxWalkSpeed = fDefaultMoveSpeed * SpeedFactor;

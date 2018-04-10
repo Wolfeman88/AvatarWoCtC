@@ -286,6 +286,11 @@ void UAttackComponent::ClearQueue()
 	DM_QueuedOffset = 0.f;
 }
 
+bool UAttackComponent::GetAttackTimerActive() const
+{
+	return OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle);
+}
+
 void UAttackComponent::M_Light()
 {
 	TArray<FMeleeTrace> traces = M_CurrentAttackData.Traces;

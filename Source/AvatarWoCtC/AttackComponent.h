@@ -151,6 +151,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Speed")
 	float StunAttackSpeedFactor = 0.75f;
 
+	bool GetAttackTimerActive() const;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack Timer")

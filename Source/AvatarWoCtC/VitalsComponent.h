@@ -1,0 +1,72 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/ActorComponent.h"
+#include "VitalsComponent.generated.h"
+
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class AVATARWOCTC_API UVitalsComponent : public UActorComponent
+{
+	GENERATED_BODY()
+
+	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
+
+public:	
+	// Sets default values for this component's properties
+	UVitalsComponent();
+
+protected:
+	// Called when the game starts
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
+	float BaseHealth = 100.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	float CurrentHealth;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Energy")
+	float BaseEnergy = 100.f;
+	UPROPERTY(BlueprintReadOnly, Category = "Energy")
+	float CurrentEnergy;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
+	float MaxJing = 50.f;
+	UPROPERTY(Category = "Jing", meta = (ClampMin = -50.f, ClampMax = 50.f))
+	float Jing = 0.f;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
+	float HealthRegenPerSecond = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Energy")
+	float EnergyRegenPerSecond = 20.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
+	float JingCenteringPerSecond = 10.f;
+
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	bool bWasAttackedRecently = false;
+	UPROPERTY(EditDefaultsOnly, Category = "Health")
+	float RecentlyAttackedTime = 3.f;
+	FTimerHandle RecentlyAttackedTimerHandle;
+
+public:	
+	// Called every frame
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	// returns Jing value normalized to a 0 to 100 scale
+	UFUNCTION(BlueprintCallable, Category = "Jing")
+	float GetCurrentJing();
+
+	// set corresponding vital and return new value
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	float UpdateHealth(float HealthDelta);
+	// set corresponding vital and return new value
+	UFUNCTION(BlueprintCallable, Category = "Energy")
+	float UpdateEnergy(float EnergyDelta);
+	// set corresponding vital and return new value
+	UFUNCTION(BlueprintCallable, Category = "Jing")
+	float UpdateJing(float JingDelta);	
+};
