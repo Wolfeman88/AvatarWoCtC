@@ -12,6 +12,7 @@
 #include "./AttackComponent.h"
 #include "TimerManager.h"
 #include "DrawDebugHelpers.h"
+#include "./VitalsComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -51,6 +52,7 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 
 	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
+	VitalsComp = CreateDefaultSubobject<UVitalsComponent>(TEXT("VitalsComponent"));
 }
 
 void AAvatarWoCtCCharacter::BeginPlay()

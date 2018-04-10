@@ -31,6 +31,9 @@ class AAvatarWoCtCCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Melee", meta = (AllowPrivateAccess = "true"))
 	class UAttackComponent* AttackComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Vitals", meta = (AllowPrivateAccess = "true"))
+	class UVitalsComponent* VitalsComp;
+
 	bool bCanDoubleJump = false;
 	bool bCanHover = false;
 	bool bJumpHeld = false;

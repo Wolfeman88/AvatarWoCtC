@@ -38,9 +38,14 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	if (!OwningCharacter->GetAttackTimerActive()) Jing = (UKismetMathLibrary::NearlyEqual_FloatFloat(Jing, 0.f, 1.f)) ? 0.f : Jing - (JingCenteringPerSecond * DeltaTime);
 }
 
-float UVitalsComponent::GetCurrentJing()
+float UVitalsComponent::GetNormalizedCurrentJing() const
 {
-	return Jing + 50.f;
+	return Jing + MaxJing;
+}
+
+float UVitalsComponent::GetNormalizedMaxJing() const
+{
+	return MaxJing + MaxJing;
 }
 
 float UVitalsComponent::UpdateHealth(float HealthDelta)
@@ -57,7 +62,7 @@ float UVitalsComponent::UpdateEnergy(float EnergyDelta)
 
 float UVitalsComponent::UpdateJing(float JingDelta)
 {
-	Jing += JingDelta;
+	Jing = FMath::Clamp(Jing + JingDelta, -MaxJing, MaxJing);
 	return Jing;
 }
 

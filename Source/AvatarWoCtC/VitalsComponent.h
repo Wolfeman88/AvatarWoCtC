@@ -32,18 +32,18 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Energy")
 	float CurrentEnergy;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
+	UPROPERTY(EditDefaultsOnly, Category = "Jing")
 	float MaxJing = 50.f;
-	UPROPERTY(Category = "Jing", meta = (ClampMin = -50.f, ClampMax = 50.f))
+
 	float Jing = 0.f;
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
 	float HealthRegenPerSecond = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Energy")
-	float EnergyRegenPerSecond = 20.f;
+	float EnergyRegenPerSecond = 15.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
-	float JingCenteringPerSecond = 10.f;
+	float JingCenteringPerSecond = 5.f;
 
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
@@ -57,8 +57,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// returns Jing value normalized to a 0 to 100 scale
-	UFUNCTION(BlueprintCallable, Category = "Jing")
-	float GetCurrentJing();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Jing")
+	float GetNormalizedCurrentJing() const;
+	// returns Jing value normalized to a 0 to 100 scale
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Jing")
+	float GetNormalizedMaxJing() const;
 
 	// set corresponding vital and return new value
 	UFUNCTION(BlueprintCallable, Category = "Health")
