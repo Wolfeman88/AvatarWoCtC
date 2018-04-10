@@ -35,7 +35,13 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (!bIsEnergyDisabled) CurrentEnergy = UpdateEnergy(EnergyRegenPerSecond * DeltaTime);
 
-	if (!OwningCharacter->GetAttackTimerActive()) Jing = (UKismetMathLibrary::NearlyEqual_FloatFloat(Jing, 0.f, 1.f)) ? 0.f : Jing - (JingCenteringPerSecond * DeltaTime);
+	if (!OwningCharacter->GetAttackTimerActive())
+	{
+		bool bIsJingCentered = UKismetMathLibrary::NearlyEqual_FloatFloat(Jing, 0.f, JingCenterTolerance);
+		float NewJing = FMath::Abs(Jing) - (JingCenteringPerSecond * DeltaTime);
+
+		Jing = (bIsJingCentered) ? 0.f : (Jing / FMath::Abs(Jing)) * NewJing;
+	}
 }
 
 float UVitalsComponent::GetNormalizedCurrentJing() const

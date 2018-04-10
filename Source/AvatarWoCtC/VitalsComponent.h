@@ -44,6 +44,8 @@ protected:
 	float EnergyRegenPerSecond = 10.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
 	float JingCenteringPerSecond = 5.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
+	float JingCenterTolerance = 0.1f;
 
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health")

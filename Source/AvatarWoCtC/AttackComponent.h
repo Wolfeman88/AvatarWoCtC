@@ -153,6 +153,13 @@ public:
 
 	bool GetAttackTimerActive() const;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Speed")
+	float LightAbilityJingDelta = 5.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Speed")
+	float HeavyAbilityJingDelta = 12.5;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Speed")
+	float StunAbilityJingDelta = 2.f;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack Timer")

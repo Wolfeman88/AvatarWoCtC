@@ -147,6 +147,11 @@ void AAvatarWoCtCCharacter::ChangeSpeedWhileActivatingAbility(float SpeedFactor)
 	GetCharacterMovement()->MaxWalkSpeed = fDefaultMoveSpeed * SpeedFactor;
 }
 
+void AAvatarWoCtCCharacter::ShiftJing(float JingChange)
+{
+	VitalsComp->UpdateJing(JingChange);
+}
+
 void AAvatarWoCtCCharacter::CheckHover()
 {
 	VitalsComp->bIsEnergyDisabled = false;
@@ -325,7 +330,7 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 		else
 		{
 			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
-			AttackComp->ActivateRangedAbility(RangedLightAttack, FVector(0.f, y_offset_sign * (float)EWidthPoints::DP_Outer_Pos - (float)EWidthPoints::DP_None, (float)EWidthPoints::DP_Outer_Neg - (float)EWidthPoints::DP_None));
+			AttackComp->ActivateRangedAbility(RangedLightAttack, FVector(0.f, y_offset_sign * ((float)EWidthPoints::DP_Outer_Pos - (float)EWidthPoints::DP_None), (float)EWidthPoints::DP_Inner_Pos - (float)EWidthPoints::DP_None));
 		}
 	}
 	else
@@ -365,7 +370,7 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 		else
 		{
 			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
-			AttackComp->ActivateRangedAbility(RangedHeavyAttack, FVector(0.f, y_offset_sign * (float)EWidthPoints::DP_Outer_Pos - (float)EWidthPoints::DP_None, (float)EWidthPoints::DP_Outer_Neg - (float)EWidthPoints::DP_None));
+			AttackComp->ActivateRangedAbility(RangedHeavyAttack, FVector(0.f, y_offset_sign * ((float)EWidthPoints::DP_Outer_Pos - (float)EWidthPoints::DP_None), (float)EWidthPoints::DP_Inner_Pos - (float)EWidthPoints::DP_None));
 		}
 	}
 	else
@@ -405,7 +410,7 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 		else
 		{
 			float y_offset_sign = FollowCamera->RelativeLocation.Y / FMath::Abs(FollowCamera->RelativeLocation.Y);
-			AttackComp->ActivateRangedAbility(RangedStunAttack, FVector(0.f, y_offset_sign * (float)EWidthPoints::DP_Outer_Pos - (float)EWidthPoints::DP_None, (float)EWidthPoints::DP_Outer_Neg - (float)EWidthPoints::DP_None));
+			AttackComp->ActivateRangedAbility(RangedStunAttack, FVector(0.f, y_offset_sign * ((float)EWidthPoints::DP_Outer_Pos - (float)EWidthPoints::DP_None), (float)EWidthPoints::DP_Inner_Pos - (float)EWidthPoints::DP_None));
 		}
 	}
 	else

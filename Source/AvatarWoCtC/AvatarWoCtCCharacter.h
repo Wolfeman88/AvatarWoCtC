@@ -78,6 +78,8 @@ public:
 
 	void ChangeSpeedWhileActivatingAbility(float SpeedFactor);
 
+	void ShiftJing(float JingChange);
+
 private:
 
 	void CheckHover();

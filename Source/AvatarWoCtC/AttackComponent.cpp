@@ -248,22 +248,48 @@ FVector UAttackComponent::ConvertMeleeVector(FMeleeVector EnumOffset)
 
 FVector UAttackComponent::GetRelativeVectorOffset(FVector Offset)
 {
-	FVector ActorLocation = GetOwner()->GetActorLocation();
+	FVector ActorLocation = OwningCharacter->GetActorLocation();
 
 	FVector OffsetX, OffsetY, OffsetZ;
-	OffsetX = GetOwner()->GetActorForwardVector() * Offset.X;
-	OffsetY = GetOwner()->GetActorRightVector() * Offset.Y;
-	OffsetZ = GetOwner()->GetActorUpVector() * Offset.Z;
+	OffsetX = OwningCharacter->GetActorForwardVector() * Offset.X;
+	OffsetY = OwningCharacter->GetActorRightVector() * Offset.Y;
+	OffsetZ = OwningCharacter->GetActorUpVector() * Offset.Z;
 
 	return ActorLocation + OffsetX + OffsetY + OffsetZ;
 }
 
 void UAttackComponent::EndAttack()
 {
-	GetOwner()->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+	float Jing = 0.f;
+
+	switch (M_CurrentAttack)
+	{
+	case EAttackType::AT_Light:
+		Jing = LightAbilityJingDelta;
+		break;
+	case EAttackType::AT_Heavy:
+		Jing = HeavyAbilityJingDelta;
+		break;
+	case EAttackType::AT_Stun:
+		Jing = StunAbilityJingDelta;
+		break;
+	case EAttackType::AT_None:
+	default:
+		break;
+	}
+
+	// TODO: rework once attack type enum is used
+	if (R_CurrentAttack) Jing = 7.f;
+	else if (DM_CurrentAttack || DR_CurrentAttack) Jing = -7.f;
+
+	OwningCharacter->ShiftJing(Jing);
+	
+	OwningCharacter->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+
 	if (M_QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(M_QueuedAttack, M_QueuedAttackData);
 	else if (R_QueuedAttack != nullptr) ActivateRangedAbility(R_QueuedAttack, R_QueuedOffset);
 	else if (DM_QueuedAttack != nullptr) ActivateMeleeDefenseAbility(DM_QueuedAttack, DM_QueuedOffset);
+	else if (DR_QueuedAttack != nullptr) ActivateRangedDefenseAbility(DR_QueuedAttack, DR_QueuedOffset);
 	else
 	{
 		M_CurrentAttack = EAttackType::AT_None;
@@ -272,6 +298,8 @@ void UAttackComponent::EndAttack()
 		R_CurrentOffset = FVector::ZeroVector;
 		DM_CurrentAttack = nullptr;
 		DM_CurrentOffset = 0.f;
+		DR_CurrentAttack = nullptr;
+		DR_CurrentOffset = 0.f;
 		OwningCharacter->ChangeSpeedWhileActivatingAbility(1.f);
 	}
 }
@@ -284,6 +312,8 @@ void UAttackComponent::ClearQueue()
 	R_QueuedOffset = FVector::ZeroVector;
 	DM_QueuedAttack = nullptr;
 	DM_QueuedOffset = 0.f;
+	DR_QueuedAttack = nullptr;
+	DR_QueuedOffset = 0.f;
 }
 
 bool UAttackComponent::GetAttackTimerActive() const
