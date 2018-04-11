@@ -336,19 +336,7 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 	{
 		if (bGuardModeActive)
 		{
-			FHitResult Hit;
-			FVector TraceStart = FollowCamera->GetComponentLocation();
-			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor);
-			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Light"), false, this);
-
-			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
-			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, Hit.Distance - CameraBoom->TargetArmLength);
-			}
-			else
-			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor) - CameraBoom->TargetArmLength);
-			}
+			AttackComp->ActivateRangedDefenseAbility(MeleeLightDefense, AttackComp->AimTargetMaxDistance - CameraBoom->TargetArmLength);
 		}
 		else
 		{
@@ -376,19 +364,7 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 	{
 		if (bGuardModeActive)
 		{
-			FHitResult Hit;
-			FVector TraceStart = FollowCamera->GetComponentLocation();
-			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor);
-			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Heavy"), false, this);
-
-			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
-			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, Hit.Distance - CameraBoom->TargetArmLength);
-			}
-			else
-			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor) - CameraBoom->TargetArmLength);
-			}
+			AttackComp->ActivateRangedDefenseAbility(MeleeHeavyDefense, AttackComp->AimTargetMaxDistance - CameraBoom->TargetArmLength);
 		}
 		else
 		{
@@ -416,19 +392,7 @@ void AAvatarWoCtCCharacter::RequestStunAttack()
 	{
 		if (bGuardModeActive)
 		{
-			FHitResult Hit;
-			FVector TraceStart = FollowCamera->GetComponentLocation();
-			FVector TraceEnd = TraceStart + GetControlRotation().Vector() * ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor);
-			FCollisionQueryParams params = FCollisionQueryParams(FName("Ranged Guard - Stun"), false, this);
-
-			if (GetWorld()->LineTraceSingleByChannel(Hit, TraceStart, TraceEnd, ECollisionChannel::ECC_Visibility, params))
-			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, Hit.Distance - CameraBoom->TargetArmLength);
-			}
-			else
-			{
-				AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, ((float)EDistancePoints::DP_Close * MaxRangeDistanceFactor) - CameraBoom->TargetArmLength);
-			}
+			AttackComp->ActivateRangedDefenseAbility(MeleeStunDefense, AttackComp->AimTargetMaxDistance - CameraBoom->TargetArmLength);
 		}
 		else
 		{

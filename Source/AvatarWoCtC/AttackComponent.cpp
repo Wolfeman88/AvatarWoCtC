@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "TimerManager.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "AvatarWoCtCCharacter.h"
 #include "Camera/CameraComponent.h"
@@ -256,9 +257,8 @@ FMeleeAttack UAttackComponent::GetRandomAttackData(EAttackType AttackStyle)
 
 void UAttackComponent::R_Attack()
 {
-	// TODO: ranged attacks should move toward reticle/target location
 	FVector SpawnLoc = GetRelativeVectorOffset(R_CurrentOffset);
-	FRotator SpawnRot = OwningCharacter->GetControlRotation();
+	FRotator SpawnRot = GetAimTargetRotator(SpawnLoc);
 	FActorSpawnParameters params;
 	params.Owner = OwningCharacter;
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -270,7 +270,6 @@ void UAttackComponent::R_Attack()
 
 void UAttackComponent::M_Defense()
 {
-	// TODO: ranged attacks should move toward reticle/target location
 	FVector SpawnLoc = GetRelativeVectorOffset(FVector(DM_CurrentOffset, 0.f, 0.f));
 	FRotator SpawnRot = OwningCharacter->GetActorForwardVector().ToOrientationRotator();
 	FActorSpawnParameters params;
@@ -284,8 +283,7 @@ void UAttackComponent::M_Defense()
 
 void UAttackComponent::R_Defense()
 {
-	// TODO: ranged attacks should move toward reticle/target location
-	FVector SpawnLoc = OwningCharacter->GetActorLocation() + OwningCharacter->GetControlRotation().Vector() * DR_CurrentOffset;
+	FVector SpawnLoc = GetAimTargetEndLocation();
 	FRotator SpawnRot = OwningCharacter->GetControlRotation();
 	FActorSpawnParameters params;
 	params.Owner = OwningCharacter;
@@ -431,3 +429,25 @@ void UAttackComponent::M_Stun()
 	EndAttack();
 }
 
+FRotator UAttackComponent::GetAimTargetRotator(FVector Start)
+{
+	FVector EndLoc = GetAimTargetEndLocation();
+	return UKismetMathLibrary::FindLookAtRotation(Start, EndLoc);
+}
+
+FVector UAttackComponent::GetAimTargetEndLocation()
+{
+	FRotator rRot = FRotator::ZeroRotator;
+
+	FHitResult hit;
+	FVector start_loc = OwningCharacter->GetFollowCamera()->GetComponentLocation();
+	FVector trace_dir = OwningCharacter->GetFollowCamera()->GetForwardVector();
+	FVector end_loc = start_loc + trace_dir * AimTargetMaxDistance;
+
+	if (GetWorld()->LineTraceSingleByChannel(hit, start_loc, end_loc, ECollisionChannel::ECC_Visibility))
+	{
+		end_loc = hit.Location;
+	}
+
+	return end_loc;
+}

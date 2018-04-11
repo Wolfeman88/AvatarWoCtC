@@ -117,6 +117,10 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	TSubclassOf<ASpawnableAttack> DR_CurrentAttack = nullptr;
 	float DR_CurrentOffset = 0.f;
 
+
+	FRotator GetAimTargetRotator(FVector Start);
+	FVector GetAimTargetEndLocation();
+
 public:	
 	// Sets default values for this component's properties
 	UAttackComponent();
@@ -159,6 +163,9 @@ public:
 	float HeavyAbilityJingDelta = 12.5;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Speed")
 	float StunAbilityJingDelta = 2.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
+	float AimTargetMaxDistance = 5000.f;
 
 protected:
 
