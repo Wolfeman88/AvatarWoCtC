@@ -321,9 +321,15 @@ FVector UAttackComponent::GetRelativeVectorOffset(FVector Offset)
 
 void UAttackComponent::EndAttack()
 {
+	EAttackType temp_type = M_CurrentAttack;
+
+	if (R_CurrentAttack) temp_type = Cast<ASpawnableAttack>(R_CurrentAttack.GetDefaultObject())->Type;
+	else if (DM_CurrentAttack) temp_type = Cast<ASpawnableAttack>(DM_CurrentAttack.GetDefaultObject())->Type;
+	else if (DR_CurrentAttack) temp_type = Cast<ASpawnableAttack>(DR_CurrentAttack.GetDefaultObject())->Type;
+
 	float Jing = 0.f;
 
-	switch (M_CurrentAttack)
+	switch (temp_type)
 	{
 	case EAttackType::AT_Light:
 		Jing = LightAbilityJingDelta;
@@ -339,9 +345,7 @@ void UAttackComponent::EndAttack()
 		break;
 	}
 
-	// TODO: rework once attack type enum is used
-	if (R_CurrentAttack) Jing = 7.f;
-	else if (DM_CurrentAttack || DR_CurrentAttack) Jing = -7.f;
+	if (DM_CurrentAttack || DR_CurrentAttack) Jing = -Jing;
 
 	OwningCharacter->ShiftJing(Jing);
 	
