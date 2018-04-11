@@ -93,6 +93,8 @@ private:
 	void RollComplete();
 	void RollCooldownComplete();
 
+	void IncrementBendingDiscipline();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Bending")
 	EBendingDisciplineType BendingDiscipline = EBendingDisciplineType::BDT_None;

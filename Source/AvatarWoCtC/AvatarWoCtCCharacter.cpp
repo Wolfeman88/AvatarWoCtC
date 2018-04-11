@@ -13,6 +13,7 @@
 #include "TimerManager.h"
 #include "DrawDebugHelpers.h"
 #include "./VitalsComponent.h"
+#include "Containers/EnumAsByte.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -135,6 +136,9 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &AAvatarWoCtCCharacter::StartRoll);
 	PlayerInputComponent->BindAction("Roll", IE_Released, this, &AAvatarWoCtCCharacter::EndRoll);
+
+	// temp behavior until item behavior is available and for debugging purposes
+	PlayerInputComponent->BindAction("UseItem", IE_Pressed, this, &AAvatarWoCtCCharacter::IncrementBendingDiscipline);
 }
 
 bool AAvatarWoCtCCharacter::GetAttackTimerActive() const
@@ -228,6 +232,20 @@ void AAvatarWoCtCCharacter::RollCooldownComplete()
 {
 	GetWorldTimerManager().ClearTimer(RollCooldownTimerHandles[0]);
 	RollCooldownTimerHandles.RemoveAt(0);
+}
+
+void AAvatarWoCtCCharacter::IncrementBendingDiscipline()
+{
+	uint8 temp = (uint8)BendingDiscipline;
+
+	temp = (temp + 1) % 5;
+
+	BendingDiscipline = (EBendingDisciplineType)temp;
+
+	bCanDoubleJump = BendingDiscipline == EBendingDisciplineType::BDT_Air;
+	bCanHover = (BendingDiscipline == EBendingDisciplineType::BDT_Air) || (BendingDiscipline == EBendingDisciplineType::BDT_Fire);
+
+	JumpMaxCount = 1 + bCanDoubleJump;
 }
 
 void AAvatarWoCtCCharacter::StartJump()
