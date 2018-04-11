@@ -34,11 +34,21 @@ void USpecialAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void USpecialAbilityComponent::ActivateSpecial()
 {
-	SpecialActive = true;
+	bIsSpecialActive = true;
 }
 
 void USpecialAbilityComponent::DeactivateSpecial()
 {
-	SpecialActive = false;
+	bIsSpecialActive = false;
+}
+
+void USpecialAbilityComponent::ResetCombo()
+{
+	ComboCount = 0;
+}
+
+void USpecialAbilityComponent::IncrementCombo()
+{
+	ComboCount++;
 }
 

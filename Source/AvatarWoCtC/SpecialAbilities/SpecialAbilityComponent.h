@@ -21,7 +21,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Special")
-	bool SpecialActive = false;
+	bool bIsSpecialActive = false;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combo")
+	bool bIsUsingCombo = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Combo")
+	int32 ComboCount = 0;
 
 public:	
 	// Called every frame
@@ -29,7 +35,17 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Special")
 	virtual void ActivateSpecial();
-
 	UFUNCTION(BlueprintCallable, Category = "Special")
 	virtual void DeactivateSpecial();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Special")
+	FORCEINLINE bool GetIsSpecialActive() const { return bIsSpecialActive; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Combo")
+	bool GetIsUsingCombo() const { return bIsUsingCombo; }
+
+	UFUNCTION(BlueprintCallable, Category = "Combo")
+	void ResetCombo();
+	UFUNCTION(BlueprintCallable, Category = "Combo")
+	void IncrementCombo();
 };
