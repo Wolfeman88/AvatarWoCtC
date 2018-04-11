@@ -246,10 +246,10 @@ void AAvatarWoCtCCharacter::StartJump()
 	}
 	else
 	{
+		if ((bRangedModeActive || bGuardModeActive) && (VitalsComp->GetCurrentEnergy() < LaunchEnergyCost)) return;
+
 		bJumpingForward = bRangedModeActive;
 		JumpDirection = GetActorForwardVector();
-
-		if ((bRangedModeActive || bGuardModeActive) && (VitalsComp->GetCurrentEnergy() < LaunchEnergyCost)) return;
 
 		if (bRangedModeActive)
 		{
