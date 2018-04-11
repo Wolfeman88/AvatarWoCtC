@@ -34,6 +34,9 @@ class AAvatarWoCtCCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Vitals", meta = (AllowPrivateAccess = "true"))
 	class UVitalsComponent* VitalsComp;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Special", meta = (AllowPrivateAccess = "true"))
+	class USpecialAbilityComponent* SpecialAbilityComp;
+
 	bool bCanDoubleJump = false;
 	bool bCanHover = false;
 	bool bJumpHeld = false;
@@ -197,5 +200,8 @@ protected:
 	float JumpEnergyCost = 25.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jump")
 	float LaunchEnergyCost = 75.f;
+
+	void StartSpecial();
+	void EndSpecial();
 };
 

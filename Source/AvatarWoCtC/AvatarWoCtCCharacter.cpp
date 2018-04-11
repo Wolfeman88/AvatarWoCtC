@@ -14,6 +14,7 @@
 #include "DrawDebugHelpers.h"
 #include "./VitalsComponent.h"
 #include "Containers/EnumAsByte.h"
+#include "./SpecialAbilities/SpecialAbilityComponent.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -54,6 +55,7 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 
 	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
 	VitalsComp = CreateDefaultSubobject<UVitalsComponent>(TEXT("VitalsComponent"));
+	SpecialAbilityComp = CreateDefaultSubobject<USpecialAbilityComponent>(TEXT("SpecialAbilityComponent"));
 }
 
 void AAvatarWoCtCCharacter::BeginPlay()
@@ -139,6 +141,9 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	// temp behavior until item behavior is available and for debugging purposes
 	PlayerInputComponent->BindAction("UseItem", IE_Pressed, this, &AAvatarWoCtCCharacter::IncrementBendingDiscipline);
+
+	PlayerInputComponent->BindAction("Special", IE_Pressed, this, &AAvatarWoCtCCharacter::StartSpecial);
+	PlayerInputComponent->BindAction("Special", IE_Released, this, &AAvatarWoCtCCharacter::EndSpecial);
 }
 
 bool AAvatarWoCtCCharacter::GetAttackTimerActive() const
@@ -457,6 +462,16 @@ void AAvatarWoCtCCharacter::StartRoll()
 void AAvatarWoCtCCharacter::EndRoll()
 {
 	bRollActive = false;
+}
+
+void AAvatarWoCtCCharacter::StartSpecial()
+{
+	SpecialAbilityComp->ActivateSpecial();
+}
+
+void AAvatarWoCtCCharacter::EndSpecial()
+{
+	SpecialAbilityComp->DeactivateSpecial();
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)
