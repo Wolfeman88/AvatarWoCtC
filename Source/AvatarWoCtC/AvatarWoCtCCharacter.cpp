@@ -257,6 +257,29 @@ void AAvatarWoCtCCharacter::IncrementBendingDiscipline()
 	CreateSpecialAbilityComponent();
 }
 
+FRotator AAvatarWoCtCCharacter::GetAimTargetRotator(FVector Start)
+{
+	FVector EndLoc = GetAimTargetEndLocation();
+	return UKismetMathLibrary::FindLookAtRotation(Start, EndLoc);
+}
+
+FVector AAvatarWoCtCCharacter::GetAimTargetEndLocation()
+{
+	FRotator rRot = FRotator::ZeroRotator;
+
+	FHitResult hit;
+	FVector start_loc = FollowCamera->GetComponentLocation();
+	FVector trace_dir = FollowCamera->GetForwardVector();
+	FVector end_loc = start_loc + trace_dir * AttackComp->AimTargetMaxDistance;
+
+	if (GetWorld()->LineTraceSingleByChannel(hit, start_loc, end_loc, ECollisionChannel::ECC_Visibility))
+	{
+		end_loc = hit.Location;
+	}
+
+	return end_loc;
+}
+
 void AAvatarWoCtCCharacter::StartJump()
 {
 	bJumpHeld = true;
@@ -449,24 +472,26 @@ void AAvatarWoCtCCharacter::CreateSpecialAbilityComponent()
 	switch (BendingDiscipline)
 	{
 	case EBendingDisciplineType::BDT_None:
-		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	case EBendingDisciplineType::BDT_Air:
-		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	case EBendingDisciplineType::BDT_Earth:
-		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	case EBendingDisciplineType::BDT_Fire:
-		SpecialAbilityComp = NewNamedObject<UFirebending_SpecialAbilityComp>(this, TEXT("FirebendingSpecial"));
+		SpecialAbilityComp = NewObject<UFirebending_SpecialAbilityComp>(this, TEXT("FirebendingSpecial"));
 		break;
 	case EBendingDisciplineType::BDT_Water:
-		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	default:
-		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	}
+
+	SpecialAbilityComp->SetReferences(this, SpecialWeaponProjectile, MaxCombo_SpecialWeaponProjectile);
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)

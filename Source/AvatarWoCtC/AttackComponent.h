@@ -117,10 +117,6 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	TSubclassOf<ASpawnableAttack> DR_CurrentAttack = nullptr;
 	float DR_CurrentOffset = 0.f;
 
-
-	FRotator GetAimTargetRotator(FVector Start);
-	FVector GetAimTargetEndLocation();
-
 public:	
 	// Sets default values for this component's properties
 	UAttackComponent();

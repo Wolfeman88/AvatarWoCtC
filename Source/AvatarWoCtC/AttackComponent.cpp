@@ -258,7 +258,7 @@ FMeleeAttack UAttackComponent::GetRandomAttackData(EAttackType AttackStyle)
 void UAttackComponent::R_Attack()
 {
 	FVector SpawnLoc = GetRelativeVectorOffset(R_CurrentOffset);
-	FRotator SpawnRot = GetAimTargetRotator(SpawnLoc);
+	FRotator SpawnRot = OwningCharacter->GetAimTargetRotator(SpawnLoc);
 	FActorSpawnParameters params;
 	params.Owner = OwningCharacter;
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -283,7 +283,7 @@ void UAttackComponent::M_Defense()
 
 void UAttackComponent::R_Defense()
 {
-	FVector SpawnLoc = GetAimTargetEndLocation();
+	FVector SpawnLoc = OwningCharacter->GetAimTargetEndLocation();
 	FRotator SpawnRot = OwningCharacter->GetControlRotation();
 	FActorSpawnParameters params;
 	params.Owner = OwningCharacter;
@@ -427,27 +427,4 @@ void UAttackComponent::M_Stun()
 	}
 
 	EndAttack();
-}
-
-FRotator UAttackComponent::GetAimTargetRotator(FVector Start)
-{
-	FVector EndLoc = GetAimTargetEndLocation();
-	return UKismetMathLibrary::FindLookAtRotation(Start, EndLoc);
-}
-
-FVector UAttackComponent::GetAimTargetEndLocation()
-{
-	FRotator rRot = FRotator::ZeroRotator;
-
-	FHitResult hit;
-	FVector start_loc = OwningCharacter->GetFollowCamera()->GetComponentLocation();
-	FVector trace_dir = OwningCharacter->GetFollowCamera()->GetForwardVector();
-	FVector end_loc = start_loc + trace_dir * AimTargetMaxDistance;
-
-	if (GetWorld()->LineTraceSingleByChannel(hit, start_loc, end_loc, ECollisionChannel::ECC_Visibility))
-	{
-		end_loc = hit.Location;
-	}
-
-	return end_loc;
 }

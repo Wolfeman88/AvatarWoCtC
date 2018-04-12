@@ -69,6 +69,7 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE UAttackComponent* GetAttackComponent() const { return AttackComp; }
 
 	bool GetAttackTimerActive() const;
 
@@ -82,6 +83,9 @@ public:
 	void ChangeSpeedWhileActivatingAbility(float SpeedFactor);
 
 	void ShiftJing(float JingChange);
+	
+	FRotator GetAimTargetRotator(FVector Start);
+	FVector GetAimTargetEndLocation();
 
 private:
 
@@ -205,5 +209,10 @@ protected:
 	void EndSpecial();
 
 	void CreateSpecialAbilityComponent();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Special")
+	TSubclassOf<ASpawnableAttack> SpecialWeaponProjectile = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Special")
+	TSubclassOf<ASpawnableAttack> MaxCombo_SpecialWeaponProjectile = nullptr;
 };
 
