@@ -36,16 +36,19 @@ void USpecialAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void USpecialAbilityComponent::ActivateSpecial()
 {
-	bIsSpecialActive = true;
+	bIsSpecialActive = !bIsSpecialActive;
 
-	if (OwningCharacter->GetBendingDiscipline() != EBendingDisciplineType::BDT_None) return;
+	if ((!bIsSpecialActive) || (OwningCharacter->GetBendingDiscipline() != EBendingDisciplineType::BDT_None)) return;
 
 	if (OwningCharacter->GetRangedModeActive())	ThrowSpecialProjectile();
+	else {}
+
+	DeactivateSpecial();
 }
 
 void USpecialAbilityComponent::DeactivateSpecial()
 {
-	bIsSpecialActive = false;
+	if (!bIsSpecialToggle && bIsSpecialActive) ActivateSpecial();
 }
 
 void USpecialAbilityComponent::ResetCombo()

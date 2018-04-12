@@ -2,6 +2,11 @@
 
 #include "Firebending_SpecialAbilityComp.h"
 
+UFirebending_SpecialAbilityComp::UFirebending_SpecialAbilityComp()
+{
+	bIsSpecialToggle = true;
+	bIsUsingCombo = true;
+}
 
 void UFirebending_SpecialAbilityComp::ActivateSpecial()
 {

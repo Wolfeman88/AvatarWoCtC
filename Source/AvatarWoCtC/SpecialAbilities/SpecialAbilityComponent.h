@@ -14,6 +14,7 @@ class AVATARWOCTC_API USpecialAbilityComponent : public UActorComponent
 
 	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
 
+
 public:	
 	// Sets default values for this component's properties
 	USpecialAbilityComponent();
@@ -24,6 +25,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Special")
 	bool bIsSpecialActive = false;
+	bool bIsSpecialToggle = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Combo")
 	bool bIsUsingCombo = false;

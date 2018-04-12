@@ -15,8 +15,8 @@ class AVATARWOCTC_API UFirebending_SpecialAbilityComp : public USpecialAbilityCo
 	GENERATED_BODY()
 	
 public:
+	UFirebending_SpecialAbilityComp();
+
 	virtual void ActivateSpecial() override;
-	virtual void DeactivateSpecial() override;
-	
-	
+	virtual void DeactivateSpecial() override;		
 };
