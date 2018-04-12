@@ -88,6 +88,7 @@ public:
 	FVector GetAimTargetEndLocation();
 
 	FORCEINLINE bool GetRangedModeActive() const { return bRangedModeActive; }
+	FORCEINLINE EBendingDisciplineType GetBendingDiscipline() const { return BendingDiscipline; }
 
 private:
 

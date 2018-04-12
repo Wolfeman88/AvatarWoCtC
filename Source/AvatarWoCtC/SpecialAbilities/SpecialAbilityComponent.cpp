@@ -38,6 +38,8 @@ void USpecialAbilityComponent::ActivateSpecial()
 {
 	bIsSpecialActive = true;
 
+	if (OwningCharacter->GetBendingDiscipline() != EBendingDisciplineType::BDT_None) return;
+
 	if (OwningCharacter->GetRangedModeActive())	ThrowSpecialProjectile();
 }
 
