@@ -13,8 +13,9 @@
 #include "TimerManager.h"
 #include "DrawDebugHelpers.h"
 #include "./VitalsComponent.h"
-#include "Containers/EnumAsByte.h"
+
 #include "./SpecialAbilities/SpecialAbilityComponent.h"
+#include "./SpecialAbilities/Firebending_SpecialAbilityComp.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -55,7 +56,6 @@ AAvatarWoCtCCharacter::AAvatarWoCtCCharacter()
 
 	AttackComp = CreateDefaultSubobject<UAttackComponent>(TEXT("AttackComponent"));
 	VitalsComp = CreateDefaultSubobject<UVitalsComponent>(TEXT("VitalsComponent"));
-	SpecialAbilityComp = CreateDefaultSubobject<USpecialAbilityComponent>(TEXT("SpecialAbilityComponent"));
 }
 
 void AAvatarWoCtCCharacter::BeginPlay()
@@ -77,6 +77,12 @@ void AAvatarWoCtCCharacter::BeginPlay()
 	fDefaultJumpZVelocity = GetCharacterMovement()->JumpZVelocity;
 
 	fDefaultBrakingFrictionFactor = GetCharacterMovement()->BrakingFrictionFactor;
+
+
+	if (BendingDiscipline == EBendingDisciplineType::BDT_Fire)
+		SpecialAbilityComp = NewNamedObject<UFirebending_SpecialAbilityComp>(this, TEXT("FirebendingSpecial"));
+	else
+		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 }
 
 void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
