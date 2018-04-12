@@ -78,11 +78,7 @@ void AAvatarWoCtCCharacter::BeginPlay()
 
 	fDefaultBrakingFrictionFactor = GetCharacterMovement()->BrakingFrictionFactor;
 
-
-	if (BendingDiscipline == EBendingDisciplineType::BDT_Fire)
-		SpecialAbilityComp = NewNamedObject<UFirebending_SpecialAbilityComp>(this, TEXT("FirebendingSpecial"));
-	else
-		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+	CreateSpecialAbilityComponent();
 }
 
 void AAvatarWoCtCCharacter::Tick(float DeltaSeconds)
@@ -257,6 +253,8 @@ void AAvatarWoCtCCharacter::IncrementBendingDiscipline()
 	bCanHover = (BendingDiscipline == EBendingDisciplineType::BDT_Air) || (BendingDiscipline == EBendingDisciplineType::BDT_Fire);
 
 	JumpMaxCount = 1 + bCanDoubleJump;
+
+	CreateSpecialAbilityComponent();
 }
 
 void AAvatarWoCtCCharacter::StartJump()
@@ -442,6 +440,33 @@ void AAvatarWoCtCCharacter::StartSpecial()
 void AAvatarWoCtCCharacter::EndSpecial()
 {
 	SpecialAbilityComp->DeactivateSpecial();
+}
+
+void AAvatarWoCtCCharacter::CreateSpecialAbilityComponent()
+{
+	if (SpecialAbilityComp) SpecialAbilityComp->DestroyComponent();
+
+	switch (BendingDiscipline)
+	{
+	case EBendingDisciplineType::BDT_None:
+		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		break;
+	case EBendingDisciplineType::BDT_Air:
+		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		break;
+	case EBendingDisciplineType::BDT_Earth:
+		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		break;
+	case EBendingDisciplineType::BDT_Fire:
+		SpecialAbilityComp = NewNamedObject<UFirebending_SpecialAbilityComp>(this, TEXT("FirebendingSpecial"));
+		break;
+	case EBendingDisciplineType::BDT_Water:
+		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		break;
+	default:
+		SpecialAbilityComp = NewNamedObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		break;
+	}
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)

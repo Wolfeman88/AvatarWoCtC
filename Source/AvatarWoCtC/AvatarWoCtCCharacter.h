@@ -203,5 +203,7 @@ protected:
 
 	void StartSpecial();
 	void EndSpecial();
+
+	void CreateSpecialAbilityComponent();
 };
 
