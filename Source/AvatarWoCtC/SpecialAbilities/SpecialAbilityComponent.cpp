@@ -38,7 +38,7 @@ void USpecialAbilityComponent::ActivateSpecial()
 {
 	bIsSpecialActive = true;
 
-	ThrowSpecialProjectile();
+	if (OwningCharacter->GetRangedModeActive())	ThrowSpecialProjectile();
 }
 
 void USpecialAbilityComponent::DeactivateSpecial()

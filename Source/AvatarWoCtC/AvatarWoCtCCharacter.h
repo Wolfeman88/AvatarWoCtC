@@ -87,6 +87,8 @@ public:
 	FRotator GetAimTargetRotator(FVector Start);
 	FVector GetAimTargetEndLocation();
 
+	FORCEINLINE bool GetRangedModeActive() const { return bRangedModeActive; }
+
 private:
 
 	void CheckHover();
