@@ -17,6 +17,7 @@ ASpawnableAttack::ASpawnableAttack()
 	RootComponent = CollisionComp;
 	CollisionComp->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	CollisionComp->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Overlap);
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	CollisionComp->bGenerateOverlapEvents = true;
 
@@ -42,14 +43,28 @@ void ASpawnableAttack::AttackHit(UPrimitiveComponent* HitComponent, AActor* Othe
 {
 	ASpawnableAttack* Attack = Cast<ASpawnableAttack>(OtherActor);
 
+	EAttackType attack_type = EAttackType::AT_None;
+	float attack_damage = 0.f;
+
 	if (Attack)
 	{
-		if (Attack->Type == this->Type)
+		attack_type = Attack->Type;
+		attack_damage = Attack->Damage;
+	}
+	else if (bHitByMeleeTrace)
+	{
+		attack_type = HitType;
+		attack_damage = HitDamage;
+	}
+
+	if (Attack || bHitByMeleeTrace)
+	{
+		if (attack_type == this->Type)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("this attack canceled out another"));
 			Destroy();
 		}
-		else if (Attack->Damage >= this->Damage)
+		else if (attack_damage >= this->Damage)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("this attack was weaker than the other"));
 			Destroy();
@@ -57,6 +72,7 @@ void ASpawnableAttack::AttackHit(UPrimitiveComponent* HitComponent, AActor* Othe
 		else
 		{
 			UE_LOG(LogTemp, Warning, TEXT("this attack was stronger than the other"));
+			Damage = Damage - attack_damage;
 		}
 	}
 	else
@@ -75,5 +91,15 @@ void ASpawnableAttack::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ASpawnableAttack::AttackHitByMelee(AAvatarWoCtCCharacter* AttackingCharacter, EAttackType MeleeType, float MeleeDamage)
+{
+	bHitByMeleeTrace = true;
+	HitType = MeleeType;
+	HitDamage = MeleeDamage;
+
+	FHitResult hit;
+	AttackHit(nullptr, AttackingCharacter, nullptr, FVector::ZeroVector, hit);
 }
 

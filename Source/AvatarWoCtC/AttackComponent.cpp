@@ -71,25 +71,28 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 	}
 
 	float speedMultiplier = 1.f;
+	float activation_time = 0.f;
 
 	switch (NewAttack)
 	{
 	case EAttackType::AT_Light:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Light, LightAttackActivationTime);
+		activation_time = LightAttackActivationTime;
 		speedMultiplier = LightAttackSpeedFactor;
 		break;
 	case EAttackType::AT_Heavy:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Heavy, HeavyAttackActivationTime);
+		activation_time = HeavyAttackActivationTime;
 		speedMultiplier = HeavyAttackSpeedFactor;
 		break;
 	case EAttackType::AT_Stun:
-		OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Stun, StunAttackActivationTime);
+		activation_time = StunAttackActivationTime;
 		speedMultiplier = StunAttackSpeedFactor;
 		break;
 	case EAttackType::AT_None:
 	default:
 		break;
 	}
+
+	OwningCharacter->GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &UAttackComponent::M_Attack, activation_time);
 
 	M_CurrentAttack = NewAttack;
 	M_CurrentAttackData = AttackData;
@@ -380,9 +383,9 @@ void UAttackComponent::EndAttack()
 
 	if (DM_CurrentAttack || DR_CurrentAttack) Jing = -Jing;
 
-	OwningCharacter->ShiftJing(Jing);
-	
+	OwningCharacter->ShiftJing(Jing);	
 	OwningCharacter->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
+	ActorsHitByAttack.Empty();
 
 	if (M_QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(M_QueuedAttack, M_QueuedAttackData);
 	else if (R_QueuedAttack != nullptr) ActivateRangedAbility(R_QueuedAttack, R_QueuedOffset);
@@ -421,46 +424,86 @@ bool UAttackComponent::GetAttackTimerActive() const
 	return OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle);
 }
 
-void UAttackComponent::M_Light()
+void UAttackComponent::M_Attack()
 {
 	TArray<FMeleeTrace> traces = M_CurrentAttackData.Traces;
+	FColor trace_color = FColor::Black;
 
-	for (int i = 0; i < traces.Num(); i++)
+	switch (M_CurrentAttack)
 	{
-		FVector Source = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].Source));
-		FVector End = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].End));
-
-		DrawDebugLine(GetWorld(), Source, End, FColor::Blue, false, 5.f, 0, 5.f);
+	case EAttackType::AT_Heavy:
+		trace_color = FColor::Red;
+		break;
+	case EAttackType::AT_Light:
+		trace_color = FColor::Blue;
+		break;
+	case EAttackType::AT_Stun:
+		trace_color = FColor::Green;
+		break;
+	case EAttackType::AT_None:
+	default:
+		break;
 	}
 
-	EndAttack();
-}
-
-void UAttackComponent::M_Heavy()
-{
-	TArray<FMeleeTrace> traces = M_CurrentAttackData.Traces;
-
 	for (int i = 0; i < traces.Num(); i++)
 	{
 		FVector Source = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].Source));
 		FVector End = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].End));
 
-		DrawDebugLine(GetWorld(), Source, End, FColor::Red, false, 5.f, 0, 20.f);
+		if (bDrawMeleeTraces) DrawDebugLine(GetWorld(), Source, End, trace_color, false, 5.f, 0, 5.f);
+
+		TArray<FHitResult> traceHits;
+		TArray<AActor*> ignored_actors;
+		ignored_actors.Add(OwningCharacter);
+
+		bool hit_success = UKismetSystemLibrary::LineTraceMulti(OwningCharacter, Source, End, ETraceVisible, false, ignored_actors, EDrawDebugTrace::None, traceHits, true);
+		
+		if (hit_success || (traceHits.Num() > 0))
+		{
+			for (FHitResult hit : traceHits)
+			{
+				ActorsHitByAttack.AddUnique(hit.GetActor());
+			}
+		}
 	}
 
-	EndAttack();
-}
-
-void UAttackComponent::M_Stun()
-{
-	TArray<FMeleeTrace> traces = M_CurrentAttackData.Traces;
-
-	for (int i = 0; i < traces.Num(); i++)
+	if (ActorsHitByAttack.Num() > 0)
 	{
-		FVector Source = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].Source));
-		FVector End = GetRelativeVectorOffset(ConvertMeleeVector(traces[i].End));
+		for (AActor* a : ActorsHitByAttack)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hit: %s"), *GetNameSafe(a));
 
-		DrawDebugLine(GetWorld(), Source, End, FColor::Green, false, 5.f, 0, 2.5f);
+			ASpawnableAttack* Attack = Cast<ASpawnableAttack>(a);
+
+			if (Attack)
+			{
+				// all melee call this on other attacks...but not other melee yet
+				Attack->AttackHitByMelee(OwningCharacter, M_CurrentAttack, M_CurrentAttackData.Damage);
+
+				if (Attack->Type == this->M_CurrentAttack)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("this attack canceled out another"));
+				}
+				else if (Attack->Damage >= this->M_CurrentAttackData.Damage)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("this attack was weaker than the other"));
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("this attack was stronger than the other"));
+					M_CurrentAttackData.Damage -= Attack->Damage;
+				}
+			}
+			else
+			{
+				AAvatarWoCtCCharacter* Character = Cast<AAvatarWoCtCCharacter>(a);
+
+				if (Character)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("this attack hit a character"));
+				}
+			}
+		}
 	}
 
 	EndAttack();

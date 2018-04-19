@@ -11,6 +11,10 @@ UCLASS()
 class AVATARWOCTC_API ASpawnableAttack : public AActor
 {
 	GENERATED_BODY()
+
+	bool bHitByMeleeTrace = false;
+	EAttackType HitType = EAttackType::AT_None;
+	float HitDamage = 0.f;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -45,4 +49,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	class URotatingMovementComponent* RotationComp;
+
+	UFUNCTION(Category = "Attack")
+	virtual void AttackHitByMelee(AAvatarWoCtCCharacter* AttackingCharacter, EAttackType MeleeType, float MeleeDamage);
 };

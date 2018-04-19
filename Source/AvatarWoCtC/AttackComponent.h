@@ -121,6 +121,8 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	FString QueuedAttackID = "";
 	FString GetAttackTypeID(EAttackType Type);
 
+	ETraceTypeQuery ETraceVisible = ETraceTypeQuery::TraceTypeQuery1;
+
 public:	
 	// Sets default values for this component's properties
 	UAttackComponent();
@@ -172,6 +174,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Queued Attack")
 	FORCEINLINE FString GetQueuedAttackID() const { return QueuedAttackID; }
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Debug")
+	bool bDrawMeleeTraces = false;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack Timer")
@@ -184,9 +189,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
 	UDataTable* StunAttackData;
 
-	void M_Light();
-	void M_Heavy();
-	void M_Stun();
+	void M_Attack();
 
 	void R_Attack();
 
