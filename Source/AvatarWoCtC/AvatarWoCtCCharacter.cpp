@@ -457,41 +457,43 @@ void AAvatarWoCtCCharacter::EndRoll()
 
 void AAvatarWoCtCCharacter::StartSpecial()
 {
-	SpecialAbilityComp->ActivateSpecial();
+	if (SpecialAbilityComp)	SpecialAbilityComp->ActivateSpecial();
 }
 
 void AAvatarWoCtCCharacter::EndSpecial()
 {
-	SpecialAbilityComp->DeactivateSpecial();
+	if (SpecialAbilityComp)	SpecialAbilityComp->DeactivateSpecial();
 }
 
 void AAvatarWoCtCCharacter::CreateSpecialAbilityComponent()
 {
-	if (SpecialAbilityComp) SpecialAbilityComp->DestroyComponent();
+	if (SpecialAbilityComp)
+	{
+		SpecialAbilityComp->DestroyComponent();
+		SpecialAbilityComp = nullptr;
+	}
 
 	switch (BendingDiscipline)
 	{
-	case EBendingDisciplineType::BDT_None:
-		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
-		break;
 	case EBendingDisciplineType::BDT_Air:
-		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		//SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	case EBendingDisciplineType::BDT_Earth:
-		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		//SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	case EBendingDisciplineType::BDT_Fire:
 		SpecialAbilityComp = NewObject<UFirebending_SpecialAbilityComp>(this, TEXT("FirebendingSpecial"));
 		break;
 	case EBendingDisciplineType::BDT_Water:
-		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		//SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
+	case EBendingDisciplineType::BDT_None:
 	default:
 		SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
 		break;
 	}
 
-	SpecialAbilityComp->SetReferences(this, SpecialWeaponProjectile, MaxCombo_SpecialWeaponProjectile);
+	if (SpecialAbilityComp) SpecialAbilityComp->SetReferences(this, SpecialWeaponProjectile, MaxCombo_SpecialWeaponProjectile);
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)

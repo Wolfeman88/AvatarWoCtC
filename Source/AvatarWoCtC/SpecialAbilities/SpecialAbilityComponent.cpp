@@ -41,7 +41,7 @@ void USpecialAbilityComponent::ActivateSpecial()
 	if ((!bIsSpecialActive) || (OwningCharacter->GetBendingDiscipline() != EBendingDisciplineType::BDT_None)) return;
 
 	if (OwningCharacter->GetRangedModeActive())	ThrowSpecialProjectile();
-	else {}
+	else { /* special melee action */}
 
 	DeactivateSpecial();
 }
@@ -58,7 +58,7 @@ void USpecialAbilityComponent::ResetCombo()
 
 void USpecialAbilityComponent::IncrementCombo()
 {
-	ComboCount++;
+	ComboCount = FMath::Min(MaxCombo, ComboCount + 1);
 }
 
 void USpecialAbilityComponent::ThrowSpecialProjectile()
