@@ -5,6 +5,7 @@
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Components/BoxComponent.h"
 #include "../AvatarWoCtCCharacter.h"
+#include "TimerManager.h"
 
 // Sets default values
 ASpawnableAttack::ASpawnableAttack()
@@ -36,7 +37,8 @@ ASpawnableAttack::ASpawnableAttack()
 void ASpawnableAttack::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (Lifetime > 0.f) GetWorldTimerManager().SetTimer(LifetimeTimerHandle, this, &ASpawnableAttack::DestroySelf, Lifetime); 
 }
 
 void ASpawnableAttack::AttackHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult & Hit)
@@ -84,6 +86,11 @@ void ASpawnableAttack::AttackHit(UPrimitiveComponent* HitComponent, AActor* Othe
 			UE_LOG(LogTemp, Warning, TEXT("this attack hit a character"));
 		}
 	}
+}
+
+void ASpawnableAttack::DestroySelf()
+{
+	Destroy();
 }
 
 // Called every frame

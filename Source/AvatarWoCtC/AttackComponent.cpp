@@ -112,7 +112,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 		ClearQueue();
 		R_QueuedAttack = AttackToSpawn;
 		R_QueuedOffset = OriginationOffset;
-		QueuedAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+		QueuedAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 		return;
 	}
 
@@ -120,7 +120,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 
 	if (AttackToSpawn)
 	{
-		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->Type;
+		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->GetType();
 		float activation_time = 1.f;
 
 		switch (temp_type)
@@ -147,7 +147,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 
 	R_CurrentAttack = AttackToSpawn;
 	R_CurrentOffset = OriginationOffset;
-	CurrentAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+	CurrentAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
 
 	R_QueuedAttack = nullptr;
@@ -163,7 +163,7 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 		ClearQueue();
 		DM_QueuedAttack = AttackToSpawn;
 		DM_QueuedOffset = OriginationOffset;
-		QueuedAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+		QueuedAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 		return;
 	}
 
@@ -171,7 +171,7 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 
 	if (AttackToSpawn)
 	{
-		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->Type;
+		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->GetType();
 		float activation_time = 1.f;
 
 		switch (temp_type)
@@ -198,7 +198,7 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 
 	DM_CurrentAttack = AttackToSpawn;
 	DM_CurrentOffset = OriginationOffset;
-	CurrentAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+	CurrentAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
 
 	DM_QueuedAttack = nullptr;
@@ -214,7 +214,7 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 		ClearQueue();
 		DR_QueuedAttack = AttackToSpawn;
 		DR_QueuedOffset = OriginationOffset;
-		QueuedAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+		QueuedAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 		return;
 	}
 
@@ -222,7 +222,7 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 
 	if (AttackToSpawn)
 	{
-		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->Type;
+		EAttackType temp_type = Cast<ASpawnableAttack>(AttackToSpawn->GetDefaultObject())->GetType();
 		float activation_time = 1.f;
 
 		switch (temp_type)
@@ -249,7 +249,7 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 
 	DR_CurrentAttack = AttackToSpawn;
 	DR_CurrentOffset = OriginationOffset;
-	CurrentAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+	CurrentAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
 
 	DR_QueuedAttack = nullptr;
@@ -359,9 +359,9 @@ void UAttackComponent::EndAttack()
 {
 	EAttackType temp_type = M_CurrentAttack;
 
-	if (R_CurrentAttack) temp_type = Cast<ASpawnableAttack>(R_CurrentAttack.GetDefaultObject())->Type;
-	else if (DM_CurrentAttack) temp_type = Cast<ASpawnableAttack>(DM_CurrentAttack.GetDefaultObject())->Type;
-	else if (DR_CurrentAttack) temp_type = Cast<ASpawnableAttack>(DR_CurrentAttack.GetDefaultObject())->Type;
+	if (R_CurrentAttack) temp_type = Cast<ASpawnableAttack>(R_CurrentAttack.GetDefaultObject())->GetType();
+	else if (DM_CurrentAttack) temp_type = Cast<ASpawnableAttack>(DM_CurrentAttack.GetDefaultObject())->GetType();
+	else if (DR_CurrentAttack) temp_type = Cast<ASpawnableAttack>(DR_CurrentAttack.GetDefaultObject())->GetType();
 
 	float Jing = 0.f;
 
@@ -480,18 +480,18 @@ void UAttackComponent::M_Attack()
 				// all melee call this on other attacks...but not other melee yet
 				Attack->AttackHitByMelee(OwningCharacter, M_CurrentAttack, M_CurrentAttackData.Damage);
 
-				if (Attack->Type == this->M_CurrentAttack)
+				if (Attack->GetType() == this->M_CurrentAttack)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("this attack canceled out another"));
 				}
-				else if (Attack->Damage >= this->M_CurrentAttackData.Damage)
+				else if (Attack->GetDamage() >= this->M_CurrentAttackData.Damage)
 				{
 					UE_LOG(LogTemp, Warning, TEXT("this attack was weaker than the other"));
 				}
 				else
 				{
 					UE_LOG(LogTemp, Warning, TEXT("this attack was stronger than the other"));
-					M_CurrentAttackData.Damage -= Attack->Damage;
+					M_CurrentAttackData.Damage -= Attack->GetDamage();
 				}
 			}
 			else

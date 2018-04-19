@@ -12,9 +12,18 @@ class AVATARWOCTC_API ASpawnableAttack : public AActor
 {
 	GENERATED_BODY()
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* CollisionComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
+	class UStaticMeshComponent* AttackMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	class URotatingMovementComponent* RotationComp;
+
 	bool bHitByMeleeTrace = false;
 	EAttackType HitType = EAttackType::AT_None;
 	float HitDamage = 0.f;
+
+	FTimerHandle LifetimeTimerHandle;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -27,29 +36,28 @@ protected:
 	UFUNCTION()
 	virtual void AttackHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION(BlueprintCallable, Category = "Life")
+	void DestroySelf();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
+	EAttackType Type = EAttackType::AT_None;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
+	float Damage = 10.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Life")
+	float Lifetime = 0.f;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	/*
-		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackInfo")
-		EConditionEffect CondEffect = EConditionEffect::CE_None;
-	*/
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
-	EAttackType Type = EAttackType::AT_None;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
-	float Damage = 10.f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
-	class UBoxComponent* CollisionComp;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
-	class UStaticMeshComponent* AttackMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
-	class URotatingMovementComponent* RotationComp;
-
 	UFUNCTION(Category = "Attack")
 	virtual void AttackHitByMelee(AAvatarWoCtCCharacter* AttackingCharacter, EAttackType MeleeType, float MeleeDamage);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Attack")
+	FORCEINLINE EAttackType GetType() const { return Type; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Attack")
+	FORCEINLINE float GetDamage() const { return Damage; }
 };
