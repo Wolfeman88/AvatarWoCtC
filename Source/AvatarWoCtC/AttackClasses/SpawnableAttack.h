@@ -33,9 +33,9 @@ public:
 	EAttackType Type = EAttackType::AT_None;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attack")
 	float Damage = 10.f;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
-	class USceneComponent* BaseNode;
+	class UBoxComponent* CollisionComp;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* AttackMesh;
