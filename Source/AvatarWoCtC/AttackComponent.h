@@ -117,6 +117,10 @@ class AVATARWOCTC_API UAttackComponent : public UActorComponent
 	TSubclassOf<ASpawnableAttack> DR_CurrentAttack = nullptr;
 	float DR_CurrentOffset = 0.f;
 
+	FString CurrentAttackID = "";
+	FString QueuedAttackID = "";
+	FString GetAttackTypeID(EAttackType Type);
+
 public:	
 	// Sets default values for this component's properties
 	UAttackComponent();
@@ -162,6 +166,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ranged")
 	float AimTargetMaxDistance = 5000.f;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Current Attack")
+	FORCEINLINE FString GetCurrentAttackID() const { return CurrentAttackID; }
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Queued Attack")
+	FORCEINLINE FString GetQueuedAttackID() const { return QueuedAttackID; }
 
 protected:
 

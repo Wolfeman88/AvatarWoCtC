@@ -36,6 +36,29 @@ void UAttackComponent::BeginPlay()
 	ensure(OwningCharacter);
 }
 
+FString UAttackComponent::GetAttackTypeID(EAttackType Type)
+{
+	FString rVal = "";
+
+	switch (Type)
+	{
+	case EAttackType::AT_Heavy:
+		rVal = "H";
+		break;
+	case EAttackType::AT_Light:
+		rVal = "L";
+		break;
+	case EAttackType::AT_Stun:
+		rVal = "S";
+		break;
+	case EAttackType::AT_None:
+	default:
+		break;
+	}
+
+	return rVal;
+}
+
 void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack AttackData)
 {
 	if (OwningCharacter->GetWorldTimerManager().IsTimerActive(AttackTimerHandle))
@@ -43,6 +66,7 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 		ClearQueue();
 		M_QueuedAttack = NewAttack;
 		M_QueuedAttackData = AttackData;
+		QueuedAttackID = "m" + GetAttackTypeID(NewAttack);
 		return;
 	}
 
@@ -69,6 +93,8 @@ void UAttackComponent::ActivateMeleeAbility(EAttackType NewAttack, FMeleeAttack 
 
 	M_CurrentAttack = NewAttack;
 	M_CurrentAttackData = AttackData;
+	CurrentAttackID = "m" + GetAttackTypeID(NewAttack);
+	QueuedAttackID = "";
 
 	M_QueuedAttack = EAttackType::AT_None;
 	M_QueuedAttackData = FMeleeAttack();
@@ -83,6 +109,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 		ClearQueue();
 		R_QueuedAttack = AttackToSpawn;
 		R_QueuedOffset = OriginationOffset;
+		QueuedAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
 		return;
 	}
 
@@ -117,6 +144,8 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 
 	R_CurrentAttack = AttackToSpawn;
 	R_CurrentOffset = OriginationOffset;
+	CurrentAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+	QueuedAttackID = "";
 
 	R_QueuedAttack = nullptr;
 	R_QueuedOffset = FVector::ZeroVector;
@@ -131,6 +160,7 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 		ClearQueue();
 		DM_QueuedAttack = AttackToSpawn;
 		DM_QueuedOffset = OriginationOffset;
+		QueuedAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
 		return;
 	}
 
@@ -165,6 +195,8 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 
 	DM_CurrentAttack = AttackToSpawn;
 	DM_CurrentOffset = OriginationOffset;
+	CurrentAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+	QueuedAttackID = "";
 
 	DM_QueuedAttack = nullptr;
 	DM_QueuedOffset = 0.f;
@@ -179,6 +211,7 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 		ClearQueue();
 		DR_QueuedAttack = AttackToSpawn;
 		DR_QueuedOffset = OriginationOffset;
+		QueuedAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
 		return;
 	}
 
@@ -213,6 +246,8 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 
 	DR_CurrentAttack = AttackToSpawn;
 	DR_CurrentOffset = OriginationOffset;
+	CurrentAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->Type);
+	QueuedAttackID = "";
 
 	DR_QueuedAttack = nullptr;
 	DR_QueuedOffset = 0.f;
@@ -363,6 +398,7 @@ void UAttackComponent::EndAttack()
 		DM_CurrentOffset = 0.f;
 		DR_CurrentAttack = nullptr;
 		DR_CurrentOffset = 0.f;
+		CurrentAttackID = "";
 		OwningCharacter->ChangeSpeedWhileActivatingAbility(1.f);
 	}
 }
@@ -377,6 +413,7 @@ void UAttackComponent::ClearQueue()
 	DM_QueuedOffset = 0.f;
 	DR_QueuedAttack = nullptr;
 	DR_QueuedOffset = 0.f;
+	QueuedAttackID = "";
 }
 
 bool UAttackComponent::GetAttackTimerActive() const
