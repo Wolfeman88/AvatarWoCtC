@@ -70,4 +70,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Special")
 	void SetReferences(AAvatarWoCtCCharacter* owner, TSubclassOf<ASpawnableAttack> special, TSubclassOf<ASpawnableAttack> max_special);
+
+	UFUNCTION(BlueprintCallable, Category = "Combo")
+	virtual void AttackFinished(EAttackType Type);
+	UFUNCTION(BlueprintCallable, Category = "Combo")
+	virtual void DefenseFinished(EAttackType Type);
 };

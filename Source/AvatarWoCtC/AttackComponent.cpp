@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "Engine/DataTable.h"
 #include "./AttackClasses/SpawnableAttack.h"
+#include "./SpecialAbilities/SpecialAbilityComponent.h"
 
 // Sets default values for this component's properties
 UAttackComponent::UAttackComponent()
@@ -303,6 +304,7 @@ void UAttackComponent::R_Attack()
 
 	GetWorld()->SpawnActor<AActor>(R_CurrentAttack, SpawnLoc, SpawnRot, params);
 
+	OwningCharacter->GetSpecialAbilityComponent()->AttackFinished(R_CurrentAttack.GetDefaultObject()->GetType());
 	EndAttack();
 }
 
@@ -316,6 +318,7 @@ void UAttackComponent::M_Defense()
 
 	GetWorld()->SpawnActor<AActor>(DM_CurrentAttack, SpawnLoc, SpawnRot, params);
 
+	OwningCharacter->GetSpecialAbilityComponent()->DefenseFinished(DM_CurrentAttack.GetDefaultObject()->GetType());
 	EndAttack();
 }
 
@@ -329,6 +332,7 @@ void UAttackComponent::R_Defense()
 
 	GetWorld()->SpawnActor<AActor>(DR_CurrentAttack, SpawnLoc, SpawnRot, params);
 
+	OwningCharacter->GetSpecialAbilityComponent()->DefenseFinished(DR_CurrentAttack.GetDefaultObject()->GetType());
 	EndAttack();
 }
 
@@ -506,5 +510,6 @@ void UAttackComponent::M_Attack()
 		}
 	}
 
+	OwningCharacter->GetSpecialAbilityComponent()->AttackFinished(M_CurrentAttack);
 	EndAttack();
 }

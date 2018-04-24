@@ -80,3 +80,10 @@ void USpecialAbilityComponent::SetReferences(AAvatarWoCtCCharacter* owner, TSubc
 	MaxCombo_SpecialWeaponProjectile = max_special;
 }
 
+void USpecialAbilityComponent::AttackFinished(EAttackType Type)
+{
+}
+
+void USpecialAbilityComponent::DefenseFinished(EAttackType Type)
+{
+}

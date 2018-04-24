@@ -19,13 +19,16 @@ void UFirebending_SpecialAbilityComp::TickComponent(float DeltaTime, ELevelTick 
 	{
 		OwningCharacter->ShiftJing(-BurnChiJingRate * DeltaTime);
 
-		if (OwningCharacter->GetVitalsComponent()->GetCurrentJingZone() == EJingPhase::JP_Neutral)
-		{
-			bIsBurnChiActive = false;
-			ComboCount = 0;
-		}
+		if (OwningCharacter->GetVitalsComponent()->GetCurrentJingZone() == EJingPhase::JP_Neutral) EndBurnChi();
 	}
 }
+
+void UFirebending_SpecialAbilityComp::EndBurnChi()
+{
+	bIsBurnChiActive = false;
+	ComboCount = 0;
+}
+
 
 void UFirebending_SpecialAbilityComp::ActivateSpecial()
 {
@@ -42,6 +45,13 @@ void UFirebending_SpecialAbilityComp::DeactivateSpecial()
 {
 	Super::DeactivateSpecial();
 
+}
+
+void UFirebending_SpecialAbilityComp::DefenseFinished(EAttackType Type)
+{
+	Super::DefenseFinished(Type);
+
+	EndBurnChi();
 }
 
 

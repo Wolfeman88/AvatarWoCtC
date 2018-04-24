@@ -14,18 +14,22 @@ class AVATARWOCTC_API UFirebending_SpecialAbilityComp : public USpecialAbilityCo
 {
 	GENERATED_BODY()
 
+	void EndBurnChi();
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Firebending")
 	bool bIsBurnChiActive = false;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Firebending")
-	float BurnChiJingRate = 2.5f;
+	float BurnChiJingRate = 10.f;
 	
 public:
 	UFirebending_SpecialAbilityComp();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void ActivateSpecial() override;
-	virtual void DeactivateSpecial() override;		
+	virtual void DeactivateSpecial() override;	
+
+	virtual void DefenseFinished(EAttackType Type) override;
 };

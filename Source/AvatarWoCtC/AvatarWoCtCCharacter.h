@@ -71,6 +71,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE UAttackComponent* GetAttackComponent() const { return AttackComp; }
 	FORCEINLINE UVitalsComponent* GetVitalsComponent() const { return VitalsComp; }
+	FORCEINLINE USpecialAbilityComponent* GetSpecialAbilityComponent() const { return SpecialAbilityComp; }
 
 	bool GetAttackTimerActive() const;
 
