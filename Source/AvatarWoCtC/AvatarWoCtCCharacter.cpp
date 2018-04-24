@@ -493,7 +493,11 @@ void AAvatarWoCtCCharacter::CreateSpecialAbilityComponent()
 		break;
 	}
 
-	if (SpecialAbilityComp) SpecialAbilityComp->SetReferences(this, SpecialWeaponProjectile, MaxCombo_SpecialWeaponProjectile);
+	if (SpecialAbilityComp)
+	{
+		SpecialAbilityComp->RegisterComponent();
+		SpecialAbilityComp->SetReferences(this, SpecialWeaponProjectile, MaxCombo_SpecialWeaponProjectile);
+	}
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)

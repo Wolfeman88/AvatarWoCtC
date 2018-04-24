@@ -70,6 +70,7 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE UAttackComponent* GetAttackComponent() const { return AttackComp; }
+	FORCEINLINE UVitalsComponent* GetVitalsComponent() const { return VitalsComp; }
 
 	bool GetAttackTimerActive() const;
 
