@@ -16,6 +16,7 @@
 
 #include "./SpecialAbilities/SpecialAbilityComponent.h"
 #include "./SpecialAbilities/Firebending_SpecialAbilityComp.h"
+#include "./SpecialAbilities/Airbending_SpecialAbilityComp.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -77,6 +78,7 @@ void AAvatarWoCtCCharacter::BeginPlay()
 	fDefaultJumpZVelocity = GetCharacterMovement()->JumpZVelocity;
 
 	fDefaultBrakingFrictionFactor = GetCharacterMovement()->BrakingFrictionFactor;
+	DefaultRollCooldown = RollCooldown;
 
 	CreateSpecialAbilityComponent();
 }
@@ -161,6 +163,11 @@ void AAvatarWoCtCCharacter::ChangeSpeedWhileActivatingAbility(float SpeedFactor)
 void AAvatarWoCtCCharacter::ShiftJing(float JingChange)
 {
 	VitalsComp->UpdateJing(JingChange);
+}
+
+void AAvatarWoCtCCharacter::SetRollCooldown(float NewCooldown)
+{
+	RollCooldown = FMath::Clamp(NewCooldown, RollingSpeedDistance / RollingSpeedFactor, DefaultRollCooldown);
 }
 
 void AAvatarWoCtCCharacter::CheckHover()
@@ -387,7 +394,7 @@ void AAvatarWoCtCCharacter::RequestLightAttack()
 
 void AAvatarWoCtCCharacter::RequestHeavyAttack()
 {
-	if ((bRangedModeActive) /*|| bLockOnModeActive && 'range to target is larger than melee range'*/)
+	if (bRangedModeActive)
 	{
 		if (bGuardModeActive)
 		{
@@ -415,7 +422,7 @@ void AAvatarWoCtCCharacter::RequestHeavyAttack()
 
 void AAvatarWoCtCCharacter::RequestStunAttack()
 {
-	if ((bRangedModeActive) /*|| bLockOnModeActive && 'range to target is larger than melee range'*/)
+	if (bRangedModeActive)
 	{
 		if (bGuardModeActive)
 		{
@@ -476,7 +483,7 @@ void AAvatarWoCtCCharacter::CreateSpecialAbilityComponent()
 	switch (BendingDiscipline)
 	{
 	case EBendingDisciplineType::BDT_Air:
-		//SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		SpecialAbilityComp = NewObject<UAirbending_SpecialAbilityComp>(this, TEXT("AirbendingSpecial"));
 		break;
 	case EBendingDisciplineType::BDT_Earth:
 		//SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));

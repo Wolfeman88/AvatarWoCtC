@@ -54,6 +54,7 @@ class AAvatarWoCtCCharacter : public ACharacter
 
 	FTimerHandle RollTimerHandle;
 	float fDefaultBrakingFrictionFactor = 2.f;
+	float DefaultRollCooldown = 5.f;
 
 public:
 	AAvatarWoCtCCharacter();
@@ -91,6 +92,9 @@ public:
 
 	FORCEINLINE bool GetRangedModeActive() const { return bRangedModeActive; }
 	FORCEINLINE EBendingDisciplineType GetBendingDiscipline() const { return BendingDiscipline; }
+
+	FORCEINLINE float GetRollCooldown() const { return RollCooldown; };
+	void SetRollCooldown(float NewCooldown);
 
 private:
 
