@@ -6,6 +6,15 @@
 #include "Components/ActorComponent.h"
 #include "VitalsComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EJingPhase : uint8
+{
+	JP_MaxNegative		UMETA(DisplayName = "Maximum Negative"),
+	JP_Negative			UMETA(DisplayName = "Negative Jing"),
+	JP_Neutral			UMETA(DisplayName = "Neutral Jing"),
+	JP_Positive			UMETA(DisplayName = "Positive Jing"),
+	JP_MaxPositive		UMETA(DisplayName = "Maximum Positive")
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class AVATARWOCTC_API UVitalsComponent : public UActorComponent
@@ -54,6 +63,11 @@ protected:
 	float RecentlyAttackedTime = 3.f;
 	FTimerHandle RecentlyAttackedTimerHandle;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Jing")
+	EJingPhase CurrentJingZone = EJingPhase::JP_Neutral;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Jing")
+	float JingPhaseThreshold = 10.f;
+
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -77,6 +91,9 @@ public:
 	// set corresponding vital and return new value
 	UFUNCTION(BlueprintCallable, Category = "Jing")
 	float UpdateJing(float JingDelta);	
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Jing")
+	FORCEINLINE EJingPhase GetCurrentJingZone() const { return CurrentJingZone; }
 
 
 	UPROPERTY(BlueprintReadOnly, Category = "Energy")

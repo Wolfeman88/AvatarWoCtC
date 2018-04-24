@@ -42,6 +42,10 @@ void UVitalsComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 		Jing = (bIsJingCentered) ? 0.f : (Jing / FMath::Abs(Jing)) * NewJing;
 	}
+
+	if (Jing > JingPhaseThreshold) CurrentJingZone = (Jing > (MaxJing - 0.1f * MaxJing)) ? EJingPhase::JP_MaxPositive : EJingPhase::JP_Positive;
+	else if (Jing < -JingPhaseThreshold) CurrentJingZone = (Jing < (-MaxJing + 0.1f * MaxJing)) ? EJingPhase::JP_MaxNegative : EJingPhase::JP_Negative;
+	else CurrentJingZone = EJingPhase::JP_Neutral;
 }
 
 float UVitalsComponent::GetNormalizedCurrentJing() const

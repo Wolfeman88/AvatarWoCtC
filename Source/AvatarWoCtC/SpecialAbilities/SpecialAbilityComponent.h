@@ -12,9 +12,6 @@ class AVATARWOCTC_API USpecialAbilityComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
-
-
 public:	
 	// Sets default values for this component's properties
 	USpecialAbilityComponent();
@@ -22,6 +19,8 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	class AAvatarWoCtCCharacter* OwningCharacter = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Special")
 	bool bIsSpecialActive = false;
