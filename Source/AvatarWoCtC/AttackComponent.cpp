@@ -304,7 +304,7 @@ void UAttackComponent::R_Attack()
 
 	GetWorld()->SpawnActor<AActor>(R_CurrentAttack, SpawnLoc, SpawnRot, params);
 
-	OwningCharacter->GetSpecialAbilityComponent()->AttackFinished(R_CurrentAttack.GetDefaultObject()->GetType());
+	if (OwningCharacter->GetSpecialAbilityComponent()) OwningCharacter->GetSpecialAbilityComponent()->AttackFinished(R_CurrentAttack.GetDefaultObject()->GetType());
 	EndAttack();
 }
 
@@ -318,7 +318,7 @@ void UAttackComponent::M_Defense()
 
 	GetWorld()->SpawnActor<AActor>(DM_CurrentAttack, SpawnLoc, SpawnRot, params);
 
-	OwningCharacter->GetSpecialAbilityComponent()->DefenseFinished(DM_CurrentAttack.GetDefaultObject()->GetType());
+	if (OwningCharacter->GetSpecialAbilityComponent()) OwningCharacter->GetSpecialAbilityComponent()->DefenseFinished(DM_CurrentAttack.GetDefaultObject()->GetType());
 	EndAttack();
 }
 
@@ -332,7 +332,7 @@ void UAttackComponent::R_Defense()
 
 	GetWorld()->SpawnActor<AActor>(DR_CurrentAttack, SpawnLoc, SpawnRot, params);
 
-	OwningCharacter->GetSpecialAbilityComponent()->DefenseFinished(DR_CurrentAttack.GetDefaultObject()->GetType());
+	if (OwningCharacter->GetSpecialAbilityComponent()) OwningCharacter->GetSpecialAbilityComponent()->DefenseFinished(DR_CurrentAttack.GetDefaultObject()->GetType());
 	EndAttack();
 }
 
@@ -510,6 +510,6 @@ void UAttackComponent::M_Attack()
 		}
 	}
 
-	OwningCharacter->GetSpecialAbilityComponent()->AttackFinished(M_CurrentAttack);
+	if (OwningCharacter->GetSpecialAbilityComponent()) OwningCharacter->GetSpecialAbilityComponent()->AttackFinished(M_CurrentAttack);
 	EndAttack();
 }
