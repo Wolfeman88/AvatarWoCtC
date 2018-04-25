@@ -147,6 +147,17 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 	}
 
 	R_CurrentAttack = AttackToSpawn;
+
+	if (OwningCharacter->GetSpecialAbilityComponent() && OwningCharacter->GetSpecialAbilityComponent()->CanUseAlternateAbility())
+	{
+		TSubclassOf<ASpawnableAttack> newAttack = Cast<ASpawnableAttack>(AttackToSpawn.GetDefaultObject())->GetAlternateAttack();
+		if (newAttack)
+		{
+			bIsAlternateAttack = true;
+			R_CurrentAttack = newAttack;
+		}
+	}
+
 	R_CurrentOffset = OriginationOffset;
 	CurrentAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
@@ -198,6 +209,17 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 	}
 
 	DM_CurrentAttack = AttackToSpawn;
+
+	if (OwningCharacter->GetSpecialAbilityComponent() && OwningCharacter->GetSpecialAbilityComponent()->CanUseAlternateAbility())
+	{
+		TSubclassOf<ASpawnableAttack> newAttack = Cast<ASpawnableAttack>(AttackToSpawn.GetDefaultObject())->GetAlternateAttack();
+		if (newAttack)
+		{
+			bIsAlternateAttack = true;
+			DM_CurrentAttack = newAttack;
+		}
+	}
+
 	DM_CurrentOffset = OriginationOffset;
 	CurrentAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
@@ -249,6 +271,17 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 	}
 
 	DR_CurrentAttack = AttackToSpawn;
+
+	if (OwningCharacter->GetSpecialAbilityComponent() && OwningCharacter->GetSpecialAbilityComponent()->CanUseAlternateAbility())
+	{
+		TSubclassOf<ASpawnableAttack> newAttack = Cast<ASpawnableAttack>(AttackToSpawn.GetDefaultObject())->GetAlternateAttack();
+		if (newAttack)
+		{
+			bIsAlternateAttack = true;
+			DR_CurrentAttack = newAttack;
+		}
+	}
+
 	DR_CurrentOffset = OriginationOffset;
 	CurrentAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
@@ -390,6 +423,7 @@ void UAttackComponent::EndAttack()
 	OwningCharacter->ShiftJing(Jing);	
 	OwningCharacter->GetWorldTimerManager().ClearTimer(AttackTimerHandle);
 	ActorsHitByAttack.Empty();
+	bIsAlternateAttack = false;
 
 	if (M_QueuedAttack != EAttackType::AT_None) ActivateMeleeAbility(M_QueuedAttack, M_QueuedAttackData);
 	else if (R_QueuedAttack != nullptr) ActivateRangedAbility(R_QueuedAttack, R_QueuedOffset);

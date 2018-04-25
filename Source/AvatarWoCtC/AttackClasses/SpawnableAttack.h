@@ -48,6 +48,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Life")
 	float Lifetime = 0.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Alternate")
+	TSubclassOf<ASpawnableAttack> AlternateAttack = nullptr;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -60,4 +63,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Attack")
 	FORCEINLINE float GetDamage() const { return Damage; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Alternate")
+	FORCEINLINE TSubclassOf<ASpawnableAttack> GetAlternateAttack() const { return AlternateAttack; }
 };

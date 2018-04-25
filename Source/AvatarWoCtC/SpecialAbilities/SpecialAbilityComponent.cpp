@@ -87,3 +87,8 @@ void USpecialAbilityComponent::AttackFinished(EAttackType Type)
 void USpecialAbilityComponent::DefenseFinished(EAttackType Type)
 {
 }
+
+bool USpecialAbilityComponent::CanUseAlternateAbility() const
+{
+	return false;
+}

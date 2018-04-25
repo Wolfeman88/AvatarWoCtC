@@ -75,4 +75,7 @@ public:
 	virtual void AttackFinished(EAttackType Type);
 	UFUNCTION(BlueprintCallable, Category = "Combo")
 	virtual void DefenseFinished(EAttackType Type);
+
+	UFUNCTION(BlueprintCallable, Category = "Special")
+	virtual bool CanUseAlternateAbility() const;
 };

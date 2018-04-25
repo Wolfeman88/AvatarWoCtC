@@ -189,6 +189,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Melee Attack Data")
 	UDataTable* StunAttackData;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Alternate")
+	bool bIsAlternateAttack = false;
+
 	void M_Attack();
 
 	void R_Attack();
