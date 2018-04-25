@@ -96,6 +96,8 @@ public:
 	FORCEINLINE float GetRollCooldown() const { return RollCooldown; };
 	void SetRollCooldown(float NewCooldown);
 
+	FORCEINLINE TSubclassOf<class ASpawnableAttack> GetSpecialProjectile() const { return SpecialWeaponProjectile; }
+
 private:
 
 	void CheckHover();

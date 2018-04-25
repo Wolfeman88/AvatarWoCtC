@@ -18,6 +18,7 @@
 #include "./SpecialAbilities/Firebending_SpecialAbilityComp.h"
 #include "./SpecialAbilities/Airbending_SpecialAbilityComp.h"
 #include "./SpecialAbilities/Waterbending_SpecialAbilityComp.h"
+#include "./SpecialAbilities/Earthbending_SpecialAbilityComp.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AAvatarWoCtCCharacter
@@ -487,7 +488,7 @@ void AAvatarWoCtCCharacter::CreateSpecialAbilityComponent()
 		SpecialAbilityComp = NewObject<UAirbending_SpecialAbilityComp>(this, TEXT("AirbendingSpecial"));
 		break;
 	case EBendingDisciplineType::BDT_Earth:
-		//SpecialAbilityComp = NewObject<USpecialAbilityComponent>(this, TEXT("SpecialAbilityComponent"));
+		SpecialAbilityComp = NewObject<UEarthbending_SpecialAbilityComp>(this, TEXT("EarthbendingSpecial"));
 		break;
 	case EBendingDisciplineType::BDT_Fire:
 		SpecialAbilityComp = NewObject<UFirebending_SpecialAbilityComp>(this, TEXT("FirebendingSpecial"));

@@ -147,6 +147,7 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 	}
 
 	R_CurrentAttack = AttackToSpawn;
+	R_CurrentOffset = OriginationOffset;
 
 	if (OwningCharacter->GetSpecialAbilityComponent() && OwningCharacter->GetSpecialAbilityComponent()->CanUseAlternateAbility())
 	{
@@ -155,10 +156,11 @@ void UAttackComponent::ActivateRangedAbility(TSubclassOf<ASpawnableAttack> Attac
 		{
 			bIsAlternateAttack = true;
 			R_CurrentAttack = newAttack;
+			
+			if (OwningCharacter->GetBendingDiscipline() == EBendingDisciplineType::BDT_Earth) R_CurrentOffset = FVector((float)EDistancePoints::DP_Far, 0.f, 0.f);
 		}
 	}
 
-	R_CurrentOffset = OriginationOffset;
 	CurrentAttackID = "r" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
 
@@ -209,6 +211,7 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 	}
 
 	DM_CurrentAttack = AttackToSpawn;
+	DM_CurrentOffset = OriginationOffset;
 
 	if (OwningCharacter->GetSpecialAbilityComponent() && OwningCharacter->GetSpecialAbilityComponent()->CanUseAlternateAbility())
 	{
@@ -217,10 +220,11 @@ void UAttackComponent::ActivateMeleeDefenseAbility(TSubclassOf<ASpawnableAttack>
 		{
 			bIsAlternateAttack = true;
 			DM_CurrentAttack = newAttack;
+
+			if (OwningCharacter->GetBendingDiscipline() == EBendingDisciplineType::BDT_Earth) DM_CurrentOffset = (float)EDistancePoints::DP_Far;
 		}
 	}
 
-	DM_CurrentOffset = OriginationOffset;
 	CurrentAttackID = "md" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
 
@@ -271,6 +275,7 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 	}
 
 	DR_CurrentAttack = AttackToSpawn;
+	DR_CurrentOffset = OriginationOffset;
 
 	if (OwningCharacter->GetSpecialAbilityComponent() && OwningCharacter->GetSpecialAbilityComponent()->CanUseAlternateAbility())
 	{
@@ -279,10 +284,11 @@ void UAttackComponent::ActivateRangedDefenseAbility(TSubclassOf<ASpawnableAttack
 		{
 			bIsAlternateAttack = true;
 			DR_CurrentAttack = newAttack;
+
+			if (OwningCharacter->GetBendingDiscipline() == EBendingDisciplineType::BDT_Earth) DR_CurrentOffset = (float)EDistancePoints::DP_Far;
 		}
 	}
 
-	DR_CurrentOffset = OriginationOffset;
 	CurrentAttackID = "rd" + GetAttackTypeID(AttackToSpawn.GetDefaultObject()->GetType());
 	QueuedAttackID = "";
 

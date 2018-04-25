@@ -65,6 +65,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Attack")
 	FORCEINLINE float GetDamage() const { return Damage; }
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	FORCEINLINE float ReduceHealth(float reduction) 
+	{ 
+		Damage = Damage - reduction;
+		return Damage; 
+	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Alternate")
 	FORCEINLINE TSubclassOf<ASpawnableAttack> GetAlternateAttack() const { return AlternateAttack; }
