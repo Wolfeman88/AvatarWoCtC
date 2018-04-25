@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "../AvatarWoCtCCharacter.h"
 #include "TimerManager.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 // Sets default values
 ASpawnableAttack::ASpawnableAttack()
@@ -31,6 +32,10 @@ ASpawnableAttack::ASpawnableAttack()
 
 	RotationComp = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotationComp"));
 	RotationComp->RotationRate = FRotator::ZeroRotator;
+
+	ProjectileComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
+	ProjectileComp->InitialSpeed = 0.f;
+	ProjectileComp->MaxSpeed = 0.f;
 }
 
 // Called when the game starts or when spawned

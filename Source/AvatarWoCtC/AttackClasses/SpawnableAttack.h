@@ -18,6 +18,8 @@ class AVATARWOCTC_API ASpawnableAttack : public AActor
 	class UStaticMeshComponent* AttackMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	class URotatingMovementComponent* RotationComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	class UProjectileMovementComponent* ProjectileComp;
 
 	bool bHitByMeleeTrace = false;
 	EAttackType HitType = EAttackType::AT_None;
@@ -66,4 +68,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Alternate")
 	FORCEINLINE TSubclassOf<ASpawnableAttack> GetAlternateAttack() const { return AlternateAttack; }
+
+	FORCEINLINE UProjectileMovementComponent* GetProjectileMoveComponent() const { return ProjectileComp; }
 };
