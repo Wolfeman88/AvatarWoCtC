@@ -26,7 +26,7 @@ void UEarthbending_SpecialAbilityComp::TickComponent(float DeltaTime, ELevelTick
 
 		if (HeldBoulder)
 		{
-			HeldBoulder->SetActorLocation(OwningCharacter->GetActorLocation() + OwningCharacter->GetActorForwardVector() * (float)EDistancePoints::DP_Close);
+			HeldBoulder->SetActorLocation(OwningCharacter->GetActorLocation() + OwningCharacter->GetActorForwardVector() * (float)EDistancePoints::DP_Middle);
 			HeldBoulder->SetActorRotation(OwningCharacter->GetActorRotation());
 		}
 	}
@@ -64,7 +64,7 @@ void UEarthbending_SpecialAbilityComp::ActivateSpecial()
 	if (bIsSpecialActive && OwningCharacter->GetSpecialProjectile())
 	{
 		TSubclassOf<ASpawnableAttack> projectile_class = OwningCharacter->GetSpecialProjectile();
-		FVector spawn_loc = OwningCharacter->GetActorLocation() + OwningCharacter->GetActorForwardVector() * (float)EDistancePoints::DP_Close;
+		FVector spawn_loc = OwningCharacter->GetActorLocation() + OwningCharacter->GetActorForwardVector() * (float)EDistancePoints::DP_Middle;
 		FRotator spawn_rot = OwningCharacter->GetActorRotation();
 		FActorSpawnParameters param;
 		param.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
