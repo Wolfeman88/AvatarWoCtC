@@ -150,6 +150,9 @@ void AAvatarWoCtCCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 	PlayerInputComponent->BindAction("Special", IE_Pressed, this, &AAvatarWoCtCCharacter::StartSpecial);
 	PlayerInputComponent->BindAction("Special", IE_Released, this, &AAvatarWoCtCCharacter::EndSpecial);
+
+	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AAvatarWoCtCCharacter::StartCrouching);
+	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AAvatarWoCtCCharacter::EndCrouching);
 }
 
 bool AAvatarWoCtCCharacter::GetAttackTimerActive() const
@@ -507,6 +510,19 @@ void AAvatarWoCtCCharacter::CreateSpecialAbilityComponent()
 		SpecialAbilityComp->RegisterComponent();
 		SpecialAbilityComp->SetReferences(this, SpecialWeaponProjectile, MaxCombo_SpecialWeaponProjectile);
 	}
+}
+
+void AAvatarWoCtCCharacter::StartCrouching()
+{
+	if (!bIsCrouched) Crouch();
+	else UnCrouch();
+	
+	SetActorScale3D((GetCharacterMovement()->bWantsToCrouch) ? FVector(0.5f) : FVector(1.f));
+}
+
+void AAvatarWoCtCCharacter::EndCrouching()
+{
+	if (!bIsCrouchToggle && bIsCrouched) StartCrouching();
 }
 
 void AAvatarWoCtCCharacter::TurnAtRate(float Rate)

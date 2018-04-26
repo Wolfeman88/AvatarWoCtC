@@ -225,5 +225,11 @@ protected:
 	TSubclassOf<ASpawnableAttack> SpecialWeaponProjectile = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Special")
 	TSubclassOf<ASpawnableAttack> MaxCombo_SpecialWeaponProjectile = nullptr;
+
+	void StartCrouching();
+	void EndCrouching();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Crouch")
+	bool bIsCrouchToggle = false;
 };
 
